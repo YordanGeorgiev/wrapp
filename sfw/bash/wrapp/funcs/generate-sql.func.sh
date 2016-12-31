@@ -12,7 +12,7 @@ doGenerateSQL(){
 	
    while read -r list_file ; do   #foreach list file in the data/lst/sql dir
 
-      cd $product_version_dir/sfw/sql/mysql/run
+      cd $product_instance_dir/sfw/sql/mysql/run
          
       # foreach sql template
       while read -r sql_template ; do
@@ -48,13 +48,13 @@ doGenerateSQL(){
             done
           
          done < <(tail -n +2 "$list_file") # cat all but the first line 
-      done < <(find $product_version_dir/sfw/sql/mysql/run -type f -name '*.SQL')
-   done < <(find $product_version_dir/data/lst/sql/mysql/run -type f -name '*.list')
+      done < <(find $product_instance_dir/sfw/sql/mysql/run -type f -name '*.SQL')
+   done < <(find $product_instance_dir/data/lst/sql/mysql/run -type f -name '*.list')
    
    IFS=$TMP_IFS   # revert back to the original IFS
    find . -name '*.bak' | xargs rm -fv
    chmod -v 770 *.sql 
-   cd $product_version_dir
+   cd $product_instance_dir
 	
 	test -z "$sleep_interval" || sleep "$sleep_interval"
 	# add your action implementation code here ... 

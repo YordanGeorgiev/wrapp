@@ -153,6 +153,7 @@ meta/.git.wrapp
 docs/txt/wrapp/helps/dev/clone-to-app.help.txt
 docs/txt/wrapp/specs/dev/clone-to-app.spec.txt
 sfw/bash/wrapp/funcs/dev/clone-to-app.func.sh
+sfw/bash/wrapp/tests/dev/clone-to-app.test.sh
 1
 docs/txt/wrapp/funcs/change-version.func.txt
 docs/txt/wrapp/helps/change-version.help.txt

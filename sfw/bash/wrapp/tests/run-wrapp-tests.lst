@@ -1,21 +1,21 @@
-create-full-package
-create-relative-package
-create-full-7z-package
-create-relative-7z-package
 clone-to-app
-gmail-package
-morph-dir
-change-env-type
-change-version
-restore-tmux-session
-generate-action-files
-remove-action-files
-create-ctags
-remove-package
-backup-file
-remove-package-files
-tmux-common
-action-to-remove
-print-help
-print-usage
-clone-to-app
+#gmail-package
+#morph-dir
+#change-env-type
+#change-version
+#restore-tmux-session
+#generate-action-files
+#remove-action-files
+#create-ctags
+#remove-package
+#backup-file
+#remove-package-files
+#tmux-common
+#action-to-remove
+#print-help
+#print-usage
+#clone-to-app
+# create-full-package
+# create-relative-package
+# create-full-7z-package
+# create-relative-7z-package

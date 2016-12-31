@@ -51,7 +51,7 @@ get_function_list () {
 #------------------------------------------------------------------------------
 doRunTests(){
 
-	cd $product_version_dir
+	cd $product_instance_dir
 
 	while read -r action ; do (
 		# do not run a test if it is commented out ( starts with # )
@@ -79,7 +79,7 @@ doRunTests(){
 
 		doLog "INFO STOP :: testing action: \"$action\""
 	);
-	done < <(cat $product_version_dir/sfw/bash/wrapp/tests/run-wrapp-tests.lst)
+	done < <(cat $product_instance_dir/sfw/bash/wrapp/tests/run-wrapp-tests.lst)
 
 }
 #eof fun doRunTests
@@ -158,8 +158,8 @@ doLog(){
 
    # define default log file none specified in conf file
    test -z $log_file && \
-		mkdir -p $product_version_dir/data/log/bash && \
-			log_file="$product_version_dir/data/log/bash/$wrap_name.`date +%Y%m`.log"
+		mkdir -p $product_instance_dir/data/log/bash && \
+			log_file="$product_instance_dir/data/log/bash/$wrap_name.`date +%Y%m`.log"
    echo " [$type_of_msg] `date +%Y.%m.%d-%H:%M:%S` [$wrap_name][@$host_name] [$$] $msg " >> $log_file
 }
 #eof func doLog
@@ -231,7 +231,7 @@ doSetVars(){
 	test -z "$sleep_interval" && export sleep_iterval=3
    cd $wrap_bash_dir
    for i in {1..3} ; do cd .. ; done ;
-   export product_version_dir=`pwd`;
+   export product_instance_dir=`pwd`;
 	# include all the func files to fetch their funcs 
 	while read -r test_file ; do . "$test_file" ; done < <(find . -name "*test.sh")
 	#while read -r test_file ; do echo "$test_file" ; done < <(find . -name "*test.sh")
@@ -243,9 +243,9 @@ doSetVars(){
 	#while read -r test_file ; do echo "$test_file" ; done < <(find . -name "*test.sh")
    
 	# this will be dev , tst, prd
-   env_type=$(echo `basename "$product_version_dir"`|cut --delimiter='.' -f5)
-	product_version=$(echo `basename "$product_version_dir"`|cut --delimiter='.' -f2-4)
-	environment_name=$(basename "$product_version_dir")
+   env_type=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f5)
+	product_version=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f2-4)
+	environment_name=$(basename "$product_instance_dir")
 
 	cd ..
 	product_dir=`pwd`;
@@ -296,8 +296,8 @@ doParseConfFile(){
 		&& conf_file="$wrap_bash_dir/$wrap_name.$host_name.conf"
 	
 	# if we have perl apps they will share the same configuration settings with this one
-	test -f "$product_version_dir/$wrap_name.$host_name.conf" \
-		&& conf_file="$product_version_dir/$wrap_name.$host_name.conf"
+	test -f "$product_instance_dir/$wrap_name.$host_name.conf" \
+		&& conf_file="$product_instance_dir/$wrap_name.$host_name.conf"
 
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
