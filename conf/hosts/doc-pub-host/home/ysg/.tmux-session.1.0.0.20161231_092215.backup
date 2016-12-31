@@ -1,0 +1,5 @@
+sess--wrapp	win--run-isgpub	/opt/csitea/isg-pub/isg-pub.0.9.7.tst.ysg
+sess--wrapp	win--vim--wrapp	/opt/csitea/wrapp/wrapp.1.1.6.dev.ysg
+sess--wrapp	win--tst--wrapp	/opt/csitea/wrapp/wrapp.1.1.6.tst.ysg
+sess--wrapp	win--prd--wrapp	/opt/csitea/wrapp/wrapp.1.1.6.prd.ysg
+sess--wrapp	win--git--wrapp	/opt/csitea/wrapp/wrapp.1.1.6.git.ysg
