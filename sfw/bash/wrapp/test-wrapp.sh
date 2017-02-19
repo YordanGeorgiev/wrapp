@@ -54,8 +54,12 @@ doRunTests(){
 	cd $product_instance_dir
 
 	while read -r action ; do (
+
+		# exit as soon as ## is found
+		[[ ${action:0:2} = \#\# ]] && break
 		# do not run a test if it is commented out ( starts with # )
-		[[ $action == "#*" ]] && continue
+		[[ ${action:0:1} = \# ]] && continue
+
 		doLog "INFO START :: testing action: \"$action\""
 		while read -r test_file ; do (
 			# doLog "test_file: \"$test_file\""

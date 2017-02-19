@@ -101,9 +101,6 @@ sfw/bash/wrapp/helps/pckg/create-relative-7z-package.help.sh
 sfw/bash/wrapp/specs/pckg/create-relative-7z-package.spec.sh
 sfw/bash/wrapp/tests/pckg/create-relative-7z-package.test.sh
 1
-conf
-conf/hosts
-1
 docs/txt/wrapp/funcs/save-tmux-session.func.txt
 docs/txt/wrapp/helps/sys/tmux/save-tmux-session.help.txt
 docs/txt/wrapp/specs/save-tmux-session.spec.txt
@@ -145,8 +142,6 @@ docs/txt/wrapp/tests/pckg/create-relative-package.test.txt
 docs/txt/wrapp/helps/pckg/create-relative-package.help.txt
 meta
 meta/.dev.wrapp
-meta/.dev.ysg-cheat-sheet
-meta/.prd.ysg-cheat-sheets
 meta/.tst.wrapp
 meta/.prd.wrapp
 meta/.git.wrapp
