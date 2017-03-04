@@ -1,8 +1,20 @@
-# v1.0.8
-#------------------------------------------------------------------------------
-#  gmail the latest created package - requires mutt binary !!!
-#------------------------------------------------------------------------------
+# src/bash/wrapp/funcs/gmail-package.spec.sh
+
+# v1.0.9
+# ---------------------------------------------------------
+# todo: add doSpecGmailPackage comments ...
+# ---------------------------------------------------------
 doSpecGmailPackage(){
-	cat doc/txt/wrapp/help/gmail-package.txt	
+
+	doLog "DEBUG START doSpecGmailPackage"
+	
+	cat doc/txt/wrapp/tmpl/gmail-package.spec.txt
+	sleep 2
+	# add your action implementation code here ... 
+
+	doLog "DEBUG STOP  doSpecGmailPackage"
 }
-#eof doSpecGmailPackage
+# eof func doSpecGmailPackage
+
+
+# eof file: src/bash/wrapp/funcs/gmail-package.spec.sh

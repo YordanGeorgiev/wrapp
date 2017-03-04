@@ -4,33 +4,31 @@
 	
 	# Purpose:
 	# ------------------------------------------------------
-	-- todo: what is the purpose of the doTestGmailPackage function
+	to test whether the sending to gmail works 
 
 	# Prequisites
 	# ------------------------------------------------------
-	-- todo: what are the prerequisites of the doTestGmailPackage function
+   preconfigured muttrc , mutt , see .muttrc from meta
 
 	# Installation
 	# ------------------------------------------------------
-	-- todo: what are the required installations for the  
-		doTestGmailPackage function to execute without errors
+   register gmail account , install mutt , configure muttrc
 
 	# Interdependancies
 	# ------------------------------------------------------
-	-- todo: what are the interdependancies for the  
-		doTestGmailPackage function to execute without errors
+   preconfigured muttrc , mutt , see .muttrc from meta
 
 	# Usage:
 	# ------------------------------------------------------
-	-- todo: how can be the doTestGmailPackage used 
+	bash src/bash/wrapp/wrapp.sh -a gmail-package
 
 	# Developent
 	# ------------------------------------------------------
-	-- todo: what issues, todos could be pointed for development
+	-- simplify .muttrc configuration, add to to docs
 
 	# Caveats:
 	# ------------------------------------------------------
-	-- todo: what are the known caveats of the doTestGmailPackage functions
+	- if there is not full-development package created no joy ..
 
 
 
