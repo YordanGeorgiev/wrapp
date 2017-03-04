@@ -1,0 +1,41 @@
+# doc/txt/wrapp/remove-action-files/remove-action-files.spec.txt
+
+	doSpecRemoveActionFiles
+	
+	# Purpose:
+	# ------------------------------------------------------
+	to provide a quick oneliner for removing specified action files
+
+	# Prequisites
+	# ------------------------------------------------------
+	perl , bash
+
+	# Installation
+	# ------------------------------------------------------
+	install perl , bash 
+
+	# Interdependancies
+	# ------------------------------------------------------
+	you need to specify the action files to be removed in the : 
+	src/bash/wrapp/tests/rem-wrapp-actions.lst
+	list file
+	echo create-full-7z-package >> src/bash/wrapp/tests/rem-wrapp-actions.lst
+
+	# Usage:
+	# ------------------------------------------------------
+	bash src/bash/wrapp/wrapp.sh -a remove-action-files
+
+
+	# Issues
+	# ------------------------------------------------------
+	console output ?!:
+	bash: line 1: src/bash/wrapp/funcs/action-to-remove.func.sh: No such file or directory
+
+	# Caveats:
+	# ------------------------------------------------------
+	of course your actions to be removed should not overlap with 
+	actions you do not want to remove , since we use grep ... 
+
+
+
+# eof file: doc/txt/wrapp/remove-action-files/remove-action-files.spec.txt
