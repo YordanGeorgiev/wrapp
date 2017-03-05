@@ -12,7 +12,6 @@ doCreateRelative7zPackage(){
 	test -z "$pcking_pw" && doExit 1 " Empty packaging password-> do export pcking_pw=secret !!!"
 	which 7z 2>/dev/null || { echo >&2 "The 7z binary is missing ! Aborting ..."; exit 1; }
 
-	flag_completed=0
 	cd $product_instance_dir
 	mkdir -p $product_dir/dat/zip
 		test $? -ne 0 && doExit 2 "Failed to create $product_instance_dir/dat/zip !"
@@ -88,8 +87,6 @@ doCreateRelative7zPackage(){
 	doLog "INFO with the following network backup  :" && \
 	doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_7z_file_name\"`"
 
-	flag_completed=1
-	
 	doLog "INFO :: STOP  :: create-relative-7z-package.func"
 
 }

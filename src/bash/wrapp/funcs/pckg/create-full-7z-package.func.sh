@@ -7,7 +7,6 @@
 doCreateFull7zPackage(){
 
 	doLog "INFO START  ::: create-full-7z-package" ;
-	flag_completed=0
 	
 	which 7z 2>/dev/null || { echo >&2 "The 7z binary is missing ! Aborting ..."; exit 1; }
 
@@ -69,8 +68,6 @@ doCreateFull7zPackage(){
 	doLog "INFO created the following full 7z package:"
 	doLog "INFO $zip_7z_file"
 
-	flag_completed=1
-	
 	test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_7z_file $network_backup_dir/"
 
 	doLog "INFO STOP  ::: create-full-7z-package" ;

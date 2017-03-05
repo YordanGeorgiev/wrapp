@@ -7,7 +7,6 @@
 #------------------------------------------------------------------------------
 doCreateRelativePackage(){
 
-	flag_completed=0
 	cd $product_instance_dir
 	mkdir -p $product_dir/dat/zip
 		test $? -ne 0 && doExit 2 "Failed to create $product_instance_dir/dat/zip !"
@@ -24,7 +23,7 @@ doCreateRelativePackage(){
 
    tgt_env_type=$(echo `basename "$include_file"`|cut --delimiter='.' -f2)
 
-	timestamp=`date +%Y%m%d_%H%M%S`
+	timestamp=`date "+%Y%m%d_%H%M%S"`
 	# the last token of the include_file with . token separator - thus no points in names
 	zip_file_name=$(echo $include_file | rev | cut -d. -f 1 | rev)
 	zip_file_name="$zip_file_name.$product_version.$tgt_env_type.$timestamp.$host_name.rel.zip"
@@ -47,7 +46,7 @@ doCreateRelativePackage(){
 	doLog "DEBUG ret is $ret "
 	test $ret -ne 0 && doExit "non-existend file specified in the include file: $include_file "
 
-
+   sleep 6
 	
 	# start: add the perl_ignore_file_pattern
 	while read -r line ; do \
@@ -69,7 +68,8 @@ doCreateRelativePackage(){
 	ret=$? ; set +x ;
 	[ $ret == 0 ] || rm -fv $zip_file
 	[ $ret == 0 ] || doLog "FATAL !!! deleted $zip_file , because of packaging errors !!!"
-	[ $ret == 0 ] || exit 1
+	[ $ret == 0 ] || export exit_code=1
+	[ $ret == 0 ] || doExit $exit_code
 
 	cd $product_dir
 	doLog "INFO created the following relative package:"
@@ -85,8 +85,6 @@ doCreateRelativePackage(){
 	cmd="cp -v $zip_file $network_backup_dir/$zip_file_name" && doRunCmdOrExit "$cmd" && \
 	doLog "INFO with the following network backup  :" && \
 	doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_file_name\"`"
-
-	flag_completed=1
 
 }
 #eof doCreateRelativePackage
