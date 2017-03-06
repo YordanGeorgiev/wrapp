@@ -10,6 +10,8 @@ umask 022    ;
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
 trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
+trap "exit 1" TERM
+export TOP_PID=$$
 
 # v1.1.3 
 #------------------------------------------------------------------------------
@@ -19,7 +21,7 @@ main(){
    doInit
   	doSetVars
 	doRunTests "$@"
-  	doExit 0 "# = STOP  MAIN = $wrap_name "
+  	doExit 0 "# = STOP  MAIN = $wrap_name_tester "
 
 }
 #eof main
@@ -45,13 +47,15 @@ get_function_list () {
 
 
 #
-# v1.1.3 
+# v1.1.4
 #------------------------------------------------------------------------------
 # run all the actions
 #------------------------------------------------------------------------------
 doRunTests(){
 
 	cd $product_instance_dir
+
+   doLogTestRunEntry 'INIT'
 
 	while read -r action ; do (
 
@@ -61,30 +65,41 @@ doRunTests(){
 		[[ ${action:0:1} = \# ]] && continue
 
 		doLog "INFO START :: testing action: \"$action\""
+      doLogTestRunEntry 'START'
 		while read -r test_file ; do (
+
 			# doLog "test_file: \"$test_file\""
 			while read -r function_name ; do (
 
 				action_name=`echo $(basename $test_file)|sed -e 's/.test.sh//g'`
-				test "$action_name" != "$action" && continue
-				
-				doLog "INFO START ::: calling function":"$function_name"
-				test "$action_name" == "$action" && $function_name
-				doLog "INFO STOP  ::: calling function":"$function_name"
-
-				# and clear the screen
-				test -z "$sleep_interval" || sleep $sleep_interval
-				printf "\033[2J";printf "\033[0;0H"
-
+            
+            if [ "$action_name" != "$action" ]
+            then
+               continue
+            else
+				   doLog "INFO START ::: calling function":"$function_name"
+               doLogTestRunEntry 'INFO' ' '$(date "+%H:%M:%S")
+               $function_name
+               doLog "INFO test-wrapp loop exit_code: $exit_code" 
+               doLogTestRunEntry 'INFO' ' '$(date "+%H:%M:%S")
+               doLogTestRunEntry 'INFO' ' '"$action_name"
+               # all testing functions should export their exit code
+               doLogTestRunEntry 'STOP' $exit_code
+				   # and clear the screen
+		         doLog "INFO STOP :: testing action: \"$action\""
+               # test $exit_code -ne 0 && doExit $exit_code "FATAL $function_name"
+				   test -z "$sleep_interval" || sleep $sleep_interval
+				   printf "\033[2J";printf "\033[0;0H"
+            fi
 			);
 			done< <(get_function_list "$test_file")
 		); 
 		done < <(find src/bash/wrapp/tests -type f -name '*.sh')
 
-		doLog "INFO STOP :: testing action: \"$action\""
 	);
 	done < <(cat $product_instance_dir/src/bash/wrapp/tests/run-wrapp-tests.lst)
 
+   doLogTestRunEntry 'STATUS'
 }
 #eof fun doRunTests
 
@@ -100,48 +115,49 @@ doInit(){
    mkdir -p "$tmp_dir"
    ( set -o posix ; set ) >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
-   wrap_name=${my_name_ext%.*}
+   wrap_name_tester=${my_name_ext%.*}
    test $OSTYPE = 'cygwin' && host_name=`hostname -s`
    test $OSTYPE != 'cygwin' && host_name=`hostname`
 }
 #eof doInit
 
 
-# v1.1.3 
+# v1.0.8
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
 doExit(){
-
+   #set -x
    exit_code=0
    exit_msg="$*"
+
+   echo -e "\n\n"
+	cd $call_start_dir
 
    case $1 in [0-9])
       exit_code="$1";
       shift 1;
    esac
 
-   if [ "$exit_code" != 0 ] ; then
+   if (( $exit_code != 0 )); then
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
-      echo "$Msg" >&2
-      #doSendReport
+      >&2 echo "$exit_msg"
+      # doSendReport
+      doLog "FATAL STOP FOR $wrap_name_tester RUN with: "
+      doLog "FATAL exit_code: $exit_code exit_msg: $exit_msg"
+   else
+      doLog "INFO  STOP FOR $wrap_name_tester RUN with: "
+      doLog "INFO  STOP FOR $wrap_name_tester RUN: $exit_code $exit_msg"
    fi
 
    doCleanAfterRun
 
-   # if we were interrupted while creating a package delete the package
-   test -z $flag_completed || test $flag_completed -eq 0 \
-         && test -f $zip_file && rm -vf $zip_file
+   #src: http://stackoverflow.com/a/9894126/65706
+   test $exit_code -ne 0 && kill -s TERM $TOP_PID
+   test $exit_code -eq 0 && exit 0
 
-   #flush the screen
-   #printf "\033[2J";printf "\033[0;0H"
-   doLog "INFO $exit_msg"
-   echo -e "\n\n"
-	cd $call_start_dir
-   exit $exit_code
 }
 #eof func doExit
-
 
 # v1.1.3 
 #------------------------------------------------------------------------------
@@ -158,18 +174,18 @@ doLog(){
    [[ $type_of_msg == INFO ]] && type_of_msg="INFO "
 
    # print to the terminal if we have one
-   test -t 1 && echo " [$type_of_msg] `date +%Y.%m.%d-%H:%M:%S` [wrapp][@$host_name] [$$] $msg "
+   test -t 1 && echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [wrapp][@$host_name] [$$] $msg "
 
    # define default log file none specified in cnf file
    test -z $log_file && \
 		mkdir -p $product_instance_dir/dat/log/bash && \
-			log_file="$product_instance_dir/dat/log/bash/$wrap_name.`date +%Y%m`.log"
-   echo " [$type_of_msg] `date +%Y.%m.%d-%H:%M:%S` [$wrap_name][@$host_name] [$$] $msg " >> $log_file
+			log_file="$product_instance_dir/dat/log/bash/$wrap_name_tester.`date "+%Y%m"`.log"
+   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$wrap_name_tester][@$host_name] [$$] $msg " >> $log_file
 }
 #eof func doLog
 
 
-# v1.1.3
+#v1.1.0
 #------------------------------------------------------------------------------
 # cleans the unneeded during after run-time stuff
 # do put here the after cleaning code
@@ -178,7 +194,11 @@ doCleanAfterRun(){
    # remove the temporary dir and all the stuff bellow it
    cmd="rm -fvr $tmp_dir"
    doRunCmdAndLog "$cmd"
-   find "$wrap_bash_dir" -type f -name '*.bak' -exec rm -f {} \;
+
+
+#   while read -r f ; do 
+#      test -f $f && rm -fv "$f" ; 
+#   done < <(find "$wrap_bash_dir" -type f -name '*.bak')
 }
 #eof func doCleanAfterRun
 
@@ -236,6 +256,10 @@ doSetVars(){
    cd $wrap_bash_dir
    for i in {1..3} ; do cd .. ; done ;
    export product_instance_dir=`pwd`;
+   
+   # add the doLogTestRunEntry func
+   . "$product_instance_dir/src/bash/wrapp/funcs/log-test-run-entry.func.sh"
+
 	# include all the func files to fetch their funcs 
 	while read -r test_file ; do . "$test_file" ; done < <(find . -name "*test.sh")
 	#while read -r test_file ; do echo "$test_file" ; done < <(find . -name "*test.sh")
@@ -264,17 +288,23 @@ doSetVars(){
 	org_base_dir=`pwd`;
 
 	cd "$wrap_bash_dir/"
+
+   # start settiing default vars
+   do_print_debug_msgs=0
+   # stop settiing default vars
+
+
 	doParseConfFile
 	( set -o posix ; set ) >"$tmp_dir/vars.after"
 
 
 	doLog "INFO # --------------------------------------"
 	doLog "INFO # -----------------------"
-	doLog "INFO # ===		 START MAIN   === $wrap_name"
+	doLog "INFO # ===		 START MAIN   === $wrap_name_tester"
 	doLog "INFO # -----------------------"
 	doLog "INFO # --------------------------------------"
 		
-	exit_code=1
+	exit_code=0
 	doLog "INFO using the following vars:"
 	cmd="$(comm --nocheck-order -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
 	echo -e "$cmd"
@@ -293,15 +323,15 @@ doSetVars(){
 #------------------------------------------------------------------------------
 doParseConfFile(){
 	# set a default cnfiguration file
-	cnf_file="$wrap_bash_dir/$wrap_name.cnf"
+	cnf_file="$wrap_bash_dir/$wrap_name_tester.cnf"
 
 	# however if there is a host dependant cnf file override it
-	test -f "$wrap_bash_dir/$wrap_name.$host_name.cnf" \
-		&& cnf_file="$wrap_bash_dir/$wrap_name.$host_name.cnf"
+	test -f "$wrap_bash_dir/$wrap_name_tester.$host_name.cnf" \
+		&& cnf_file="$wrap_bash_dir/$wrap_name_tester.$host_name.cnf"
 	
 	# if we have perl apps they will share the same cnfiguration settings with this one
-	test -f "$product_instance_dir/$wrap_name.$host_name.cnf" \
-		&& cnf_file="$product_instance_dir/$wrap_name.$host_name.cnf"
+	test -f "$product_instance_dir/$wrap_name_tester.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/$wrap_name_tester.$host_name.cnf"
 
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
@@ -350,6 +380,7 @@ main "$@"
 #
 # VersionHistory:
 #------------------------------------------------------------------------------
+# 1.1.0 --- 2017-03-05 16:48:13 -- change to doExit , added testing report
 # 1.0.0 --- 2016-09-11 12:24:15 -- init from bash-stub
 #----------------------------------------------------------
 #

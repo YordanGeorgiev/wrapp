@@ -7,7 +7,6 @@
 #------------------------------------------------------------------------------
 doCreateRelativePackage(){
 
-	flag_completed=0
 	cd $product_instance_dir
 	mkdir -p $product_dir/dat/zip
 		test $? -ne 0 && doExit 2 "Failed to create $product_instance_dir/dat/zip !"
@@ -24,7 +23,7 @@ doCreateRelativePackage(){
 
    tgt_env_type=$(echo `basename "$include_file"`|cut --delimiter='.' -f2)
 
-	timestamp=`date +%Y%m%d_%H%M%S`
+	timestamp=`date "+%Y%m%d_%H%M%S"`
 	# the last token of the include_file with . token separator - thus no points in names
 	zip_file_name=$(echo $include_file | rev | cut -d. -f 1 | rev)
 	zip_file_name="$zip_file_name.$product_version.$tgt_env_type.$timestamp.$host_name.rel.zip"
@@ -45,9 +44,7 @@ doCreateRelativePackage(){
 	done < <(cat $include_file)
 
 	doLog "DEBUG ret is $ret "
-	test $ret -ne 0 && doExit "non-existend file specified in the include file: $include_file "
-
-
+	test $ret -ne 0 && doLog "ERROR non-existend file specified in the include file: $include_file "
 	
 	# start: add the perl_ignore_file_pattern
 	while read -r line ; do \
@@ -63,30 +60,35 @@ doCreateRelativePackage(){
 
 	# zip MM ops -MM = --must-match
 	# All  input  patterns must match at least one file and all input files found must be readable.
-	ret=1
+	ret=0
 	cat $include_file | grep -vP $perl_ignore_file_pattern | grep -vP '^\s*#' \
 		| perl -ne 's|\n|\000|g;print'| xargs -0 zip -MM $zip_file
-	ret=$? ; set +x ;
-	[ $ret == 0 ] || rm -fv $zip_file
-	[ $ret == 0 ] || doLog "FATAL !!! deleted $zip_file , because of packaging errors !!!"
-	[ $ret == 0 ] || exit 1
+   
+	ret=$? ; 
+   if (( $ret != 0 )); then
+      fatal_msg1="deleted $zip_file !!!"
+      fatal_msg2="because of packaging errors !!!"
+      rm -fv $zip_file
+      doLog "FATAL $fatal_msg1"
+      doLog "FATAL $fatal_msg2"
+      doExit 1 "FATAL failed to create relative package"
+   else
+      cd $product_dir
+      doLog "INFO created the following relative package:"
+      doLog "INFO `stat -c \"%y %n\" $zip_file_name`"
 
-	cd $product_dir
-	doLog "INFO created the following relative package:"
-	doLog "INFO `stat -c \"%y %n\" $zip_file_name`"
+      test -z "$network_backup_dir" || \
+      mkdir -p $network_backup_dir && \
+      cmd="cp -v $zip_file $product_dir/dat/zip/" && doRunCmdOrExit "$cmd" && \
+      doLog "INFO with the following local backup  :" && \
+      doLog "INFO `stat -c \"%y %n\" $product_dir/dat/zip/$zip_file_name`" && \
+      doLog "INFO in the network dir @::" && \
+      doLog "INFO :: $network_backup_dir" && \
+      cmd="cp -v $zip_file $network_backup_dir/$zip_file_name" && doRunCmdOrExit "$cmd" && \
+      doLog "INFO with the following network backup  :" && \
+      doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_file_name\"`"
+   fi
 
-	test -z "$network_backup_dir" || \
-	mkdir -p $network_backup_dir && \
-	cmd="cp -v $zip_file $product_dir/dat/zip/" && doRunCmdOrExit "$cmd" && \
-	doLog "INFO with the following local backup  :" && \
-	doLog "INFO `stat -c \"%y %n\" $product_dir/dat/zip/$zip_file_name`" && \
-	doLog "INFO in the network dir @::" && \
-	doLog "INFO :: $network_backup_dir" && \
-	cmd="cp -v $zip_file $network_backup_dir/$zip_file_name" && doRunCmdOrExit "$cmd" && \
-	doLog "INFO with the following network backup  :" && \
-	doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_file_name\"`"
-
-	flag_completed=1
 
 }
 #eof doCreateRelativePackage

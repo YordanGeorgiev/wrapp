@@ -10,6 +10,9 @@ umask 022    ;
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
 trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
+trap "exit 1" TERM
+export TOP_PID=$$
+
 
 #v1.0.7 
 #------------------------------------------------------------------------------
@@ -38,7 +41,6 @@ main(){
 	doCheckReadyToStart
 	doRunActions "$@"
 	doExit 0 "# = STOP  MAIN = $wrap_name "
-
 }
 #eof main
 
@@ -200,38 +202,42 @@ doCheckReadyToStart(){
 
 
 
-#v1.0.7 
+# v1.0.8
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
 doExit(){
-
+   #set -x
    exit_code=0
    exit_msg="$*"
 
+   doCleanAfterRun
+
+   echo -e "\n\n"
+	cd $call_start_dir
+
    case $1 in [0-9])
       exit_code="$1";
+      export exit_code=$1
       shift 1;
    esac
 
-   if [ "$exit_code" != 0 ] ; then
+   if (( $exit_code != 0 )); then
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
-      echo "$Msg" >&2
-      #doSendReport
+      >&2 echo "$exit_msg"
+      # doSendReport
+      doLog "FATAL STOP FOR $wrap_name RUN with: "
+      doLog "FATAL exit_code: $exit_code exit_msg: $exit_msg"
+   else
+      doLog "INFO  STOP FOR $wrap_name RUN with: "
+      doLog "INFO  STOP FOR $wrap_name RUN: $exit_code $exit_msg"
    fi
 
-   doCleanAfterRun
 
-   # if we were interrupted while creating a package delete the package
-   test -z $flag_completed || test $flag_completed -eq 0 \
-         && test -f $zip_file && rm -vf $zip_file
-
-   #flush the screen
-   #printf "\033[2J";printf "\033[0;0H"
-   doLog "INFO $exit_msg"
-   echo -e "\n\n"
-	cd $call_start_dir
-   exit $exit_code
+   #src: http://stackoverflow.com/a/9894126/65706
+   test $exit_code -ne 0 && kill -s TERM $TOP_PID
+   test $exit_code -eq 0 && exit 0
+   
 }
 #eof func doExit
 
@@ -251,18 +257,18 @@ doLog(){
    [[ $type_of_msg == INFO ]] && type_of_msg="INFO "
 
    # print to the terminal if we have one
-   test -t 1 && echo " [$type_of_msg] `date +%Y.%m.%d-%H:%M:%S` [wrapp][@$host_name] [$$] $msg "
+   test -t 1 && echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [wrapp][@$host_name] [$$] $msg "
 
    # define default log file none specified in cnf file
    test -z $log_file && \
 		mkdir -p $product_instance_dir/dat/log/bash && \
-			log_file="$product_instance_dir/dat/log/bash/$wrap_name.`date +%Y%m`.log"
-   echo " [$type_of_msg] `date +%Y.%m.%d-%H:%M:%S` [$wrap_name][@$host_name] [$$] $msg " >> $log_file
+			log_file="$product_instance_dir/dat/log/bash/$wrap_name.`date "+%Y%m"`.log"
+   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$wrap_name][@$host_name] [$$] $msg " >> $log_file
 }
 #eof func doLog
 
 
-#v1.0.7
+#v1.1.0
 #------------------------------------------------------------------------------
 # cleans the unneeded during after run-time stuff
 # do put here the after cleaning code
@@ -271,7 +277,11 @@ doCleanAfterRun(){
    # remove the temporary dir and all the stuff bellow it
    cmd="rm -fvr $tmp_dir"
    doRunCmdAndLog "$cmd"
-   find "$wrap_bash_dir" -type f -name '*.bak' -exec rm -f {} \;
+
+
+#   while read -r f ; do 
+#      test -f $f && rm -fv "$f" ; 
+#   done < <(find "$wrap_bash_dir" -type f -name '*.bak')
 }
 #eof func doCleanAfterRun
 
@@ -350,6 +360,11 @@ doSetVars(){
 	org_base_dir=`pwd`;
 
 	cd "$wrap_bash_dir/"
+
+   # start set default vars
+   do_print_debug_msgs=0
+   # stop set default vars
+
 	doParseConfFile
 	( set -o posix ; set ) >"$tmp_dir/vars.after"
 
@@ -360,7 +375,7 @@ doSetVars(){
 	doLog "INFO # -----------------------"
 	doLog "INFO # --------------------------------------"
 		
-		exit_code=1
+		exit_code=0
 		doLog "INFO using the following vars:"
 		cmd="$(comm --nocheck-order -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
 		echo -e "$cmd"

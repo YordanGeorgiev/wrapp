@@ -12,7 +12,6 @@ doCreateRelative7zPackage(){
 	test -z "$pcking_pw" && doExit 1 " Empty packaging password-> do export pcking_pw=secret !!!"
 	which 7z 2>/dev/null || { echo >&2 "The 7z binary is missing ! Aborting ..."; exit 1; }
 
-	flag_completed=0
 	cd $product_instance_dir
 	mkdir -p $product_dir/dat/zip
 		test $? -ne 0 && doExit 2 "Failed to create $product_instance_dir/dat/zip !"
@@ -70,9 +69,9 @@ doCreateRelative7zPackage(){
 		| grep -vP "$perl_ignore_file_pattern" | grep -vP '^\s*#' | perl -ne 's|\n|\000|g;print'| \
 		xargs -0 7z u -r0 -m0=lzma2 -mx=5 -p"$pcking_pw" -w"$product_instance_dir" "$zip_7z_file"
 	ret=$? ; set +x ;
+   fatal_msg="FATAL !!! deleted $zip_7z_file , because of packaging errors !!!"
 	[ $ret == 0 ] || rm -fv $zip_7z_file
-	[ $ret == 0 ] || doLog "FATAL !!! deleted $zip_7z_file , because of packaging errors !!!"
-	[ $ret == 0 ] || exit 1
+	[ $ret == 0 ] || doExit 1 "$fatal_msg"
 
 	cd $product_dir
 	doLog "INFO created the following relative package:"
@@ -88,8 +87,6 @@ doCreateRelative7zPackage(){
 	doLog "INFO with the following network backup  :" && \
 	doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_7z_file_name\"`"
 
-	flag_completed=1
-	
 	doLog "INFO :: STOP  :: create-relative-7z-package.func"
 
 }

@@ -18,3 +18,4 @@ tmux-common
 action-to-remove
 print-help
 print-usage
+log-test-run-entry

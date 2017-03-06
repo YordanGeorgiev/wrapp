@@ -26,7 +26,13 @@
 
 	# Developent
 	# ------------------------------------------------------
-	-- todo: what issues, todos could be pointed for development
+   why does this exit_code change to 1 !!!
+   set +x	
+	# test the call with the include file of the current env - usually dev
+   exit_code=0
+	bash src/bash/wrapp/wrapp.sh -a create-relative-package
+   export exit_code=$?
+   doLog "INFO create-relative-package.test.sh exit_code: $exit_code"
 
 	# Caveats:
 	# ------------------------------------------------------

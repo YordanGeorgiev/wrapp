@@ -7,7 +7,6 @@
 doCreateFullPackage(){
 
 	doLog "INFO === START === create-full-package" ;
-	flag_completed=0
 
 	#define default vars
 	test -z $include_file         && \
@@ -33,7 +32,7 @@ doCreateFullPackage(){
 	# note: | grep -vP "$perl_ignore_file_pattern" | grep -vP '^\s*#'
 	cd $org_base_dir
 
-	timestamp=`date +%Y%m%d_%H%M%S`
+	timestamp=`date "+%Y%m%d_%H%M%S"`
 	# the last token of the include_file with . token separator - thus no points in names
 	zip_file_name=$(echo $include_file | rev | cut -d. -f 1 | rev)
 	zip_file_name="$zip_file_name.$product_version.$tgt_env_type.$timestamp.$host_name.zip"
@@ -59,18 +58,13 @@ doCreateFullPackage(){
 		done < <(cat $include_file)
 	);
 
-
+   fatal_msg="FATAL !!! deleted $zip_file , because of packaging errors $! !!!"
 	[ $ret == 0 ] || rm -fv $zip_file
-	[ $ret == 0 ] || doLog "FATAL !!! deleted $zip_file , because of packaging errors $! !!!"
-	[ $ret == 0 ] || exit 1
-
-
+	[ $ret == 0 ] || doLog 1 "$fatal_msg"
 
 	doLog "INFO created the following full development package:"
 	doLog "INFO `stat -c \"%y %n\" $zip_file`"
 
-	flag_completed=1
-	
 	test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_file $network_backup_dir/"
 
 	doLog "INFO === STOP  === create-full-package" ;
