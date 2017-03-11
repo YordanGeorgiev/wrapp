@@ -28,6 +28,7 @@ doCreateFullPackage(){
 
 	# or how-to remove the last char from a string 	
 	perl_ignore_file_pattern=$(echo "$perl_ignore_file_pattern"|sed 's/.$//')
+	test -z $perl_ignore_file_pattern && perl_ignore_file_pattern='.*\.swp$|.*\.log|$.*\.swo$'
 	echo perl_ignore_file_pattern::: $perl_ignore_file_pattern
 	# note: | grep -vP "$perl_ignore_file_pattern" | grep -vP '^\s*#'
 	cd $org_base_dir
@@ -60,7 +61,7 @@ doCreateFullPackage(){
 
    fatal_msg="FATAL !!! deleted $zip_file , because of packaging errors $! !!!"
 	[ $ret == 0 ] || rm -fv $zip_file
-	[ $ret == 0 ] || doLog 1 "$fatal_msg"
+	[ $ret == 0 ] || doExit 1 "$fatal_msg"
 
 	doLog "INFO created the following full development package:"
 	doLog "INFO `stat -c \"%y %n\" $zip_file`"

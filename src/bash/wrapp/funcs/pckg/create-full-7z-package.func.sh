@@ -36,6 +36,7 @@ doCreateFull7zPackage(){
 		got=$(echo $line|perl -ne 'm|^\s*#\s*perl_ignore_file_pattern\s*=(.*)$|g;print $1'); \
 		test -z "$got" || perl_ignore_file_pattern="$got|$perl_ignore_file_pattern" ;
 	done < <(cat $include_file)
+	test -z $perl_ignore_file_pattern && perl_ignore_file_pattern='.*\.swp$|.*\.log|$.*\.swo$'
 
 	# or how-to remove the last char from a string 	
 	perl_ignore_file_pattern=$(echo "$perl_ignore_file_pattern"|sed 's/.$//')

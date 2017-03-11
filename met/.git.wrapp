@@ -114,8 +114,8 @@ doc/txt/wrapp/helps/sys/backup-file.help.txt
 doc/txt/wrapp/funcs/backup-file.func.txt
 1
 doc/txt/wrapp/specs/pckg/create-relative-package.spec.txt
-doc/txt/wrapp/funcs/pckg/create-relative-package.func.txt
 doc/txt/wrapp/tests/pckg/create-relative-package.test.txt
+doc/txt/wrapp/funcs/pckg/create-relative-package.func.txt
 doc/txt/wrapp/helps/pckg/create-relative-package.help.txt
 src/bash/wrapp/specs/pckg/create-relative-package.spec.sh
 src/bash/wrapp/helps/pckg/create-relative-package.help.sh

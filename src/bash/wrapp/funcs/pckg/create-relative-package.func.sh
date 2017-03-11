@@ -54,7 +54,7 @@ doCreateRelativePackage(){
 
 	# or how-to remove the last char from a string 	
 	perl_ignore_file_pattern=$(echo "$perl_ignore_file_pattern"|sed 's/.$//')
-	echo perl_ignore_file_pattern::: $perl_ignore_file_pattern
+	test -z $perl_ignore_file_pattern && perl_ignore_file_pattern='.*\.swp$|.*\.log|$.*\.swo$'
 	# note: | grep -vP "$perl_ignore_file_pattern" | grep -vP '^\s*#'
 
 
