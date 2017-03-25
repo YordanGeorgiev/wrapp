@@ -1,10 +1,21 @@
 #  WRAPP
 
 
+Table of Contents
+
+  * [1. WHAT IS IT ?!](#1-what-is-it-)
+  * [2. INSTALLATION AND CONFIGURATION](#2-installation-and-configuration)
+    * [2.1. Prerequisites](#21-prerequisites)
+    * [2.2. Fetch the source](#22-fetch-the-source)
+    * [2.3. Build the first wrapp instance](#23-build-the-first-wrapp-instance)
+    * [2.4. Create you local conf file](#24-create-you-local-conf-file)
+    * [2.5. Start hacking](#25-start-hacking)
+
+
     
 
 ## 1. What is it ?!
-A generic swiss knife wanna be bash / perl centric application wrapper for quicky packaging and deploying your tools, create new tools out of your existing ones , generating code for additonal functions, search and replace in both file paths and contents ... and all the rest not mentioned actions in the src/bash/wrapp/tests/all-wrapp-tests.lst file ...
+A generic swiss knife wanna be bash / perl centric application wrapper for quicky packaging and deploying your tools, create new tools out of your existing ones , generating code for additonal functions, search and replace in both file paths and contents ... and all the rest not mentioned actions in the [sfw/bash/wrapp/tests](sfw/bash/wrapp/tests/all-wrapp-tests.lst) file ...
 
     
 
@@ -53,23 +64,23 @@ Each wrapp instance has it's own version, environmnt type and owner. For now jus
     mv -v /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
     
 
-### 2.4. Create you local cnf file
-The default cnf file provides only limited functionality ( this is by design ) , thus copy and cnfigure the cnfiguration file for your host
+### 2.4. Create you local conf file
+The default conf file provides only limited functionality ( this is by design ) , thus copy and configure the configuration file for your host
 
     # go to the product version dir
     cd /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
     
-    mv -v src/bash/wrapp/wrapp.set-your-host.cnf src/bash/wrapp/wrapp.`hostname -s`.cnf
+    mv -v sfw/bash/wrapp/wrapp.set-your-host.conf sfw/bash/wrapp/wrapp.`hostname -s`.conf
 
 ### 2.5. Start hacking
 Start hacking … or wait check at least the test call running all the functions of the tool … 
 
     # opionally if you are in the vim camp open the "project relative files list file"
-    vim met/.dev.wrapp
+    vim meta/.dev.wrapp
     
     # Ctrl + Z , 
-    bash src/bash/wrapp/test-wrapp.sh 
+    bash sfw/bash/wrapp/test-wrapp.sh 
     
     # now clone your own instance
-    bash src/bash/wrapp/wrapp.sh -a to-app=my-tool
+    bash sfw/bash/wrapp/wrapp.sh -a to-app=my-tool
 
