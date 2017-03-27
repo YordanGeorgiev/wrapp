@@ -1,5 +1,6 @@
 # perl_ignore_file_pattern=.*\.swp$|.*\.log|$.*\.swo$
 src/bash/wrapp/tests/run-wrapp-tests.lst
+src/bash/wrapp/wrapp.CMac.cnf
 src/bash/wrapp/test-wrapp.sh
 src/bash/wrapp/wrapp.sh
 README.md

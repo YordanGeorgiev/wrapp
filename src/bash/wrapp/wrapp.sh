@@ -113,10 +113,10 @@ doRunActions(){
 #------------------------------------------------------------------------------
 doInit(){
    call_start_dir=`pwd`
-   wrap_bash_dir=`dirname $(readlink -f $0)`
+   wrap_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
    tmp_dir="$wrap_bash_dir/tmp/.tmp.$$"
    mkdir -p "$tmp_dir"
-   ( set -o posix ; set ) >"$tmp_dir/vars.before"
+   ( set -o posix ; set )| sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    wrap_name=${my_name_ext%.*}
    test $OSTYPE = 'cygwin' && host_name=`hostname -s`
@@ -343,8 +343,8 @@ doSetVars(){
 	# while read -r func_file ; do echo "$func_file" ; done < <(find . -name "*func.sh")
 
    # this will be dev , tst, prd
-   env_type=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f5)
-	product_version=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f2-4)
+   env_type=$(echo `basename "$product_instance_dir"`|cut -d'.' -f5)
+	product_version=$(echo `basename "$product_instance_dir"`|cut -d'.' -f2-4)
 	environment_name=$(basename "$product_instance_dir")
 
 	cd ..
@@ -366,7 +366,7 @@ doSetVars(){
    # stop set default vars
 
 	doParseConfFile
-	( set -o posix ; set ) >"$tmp_dir/vars.after"
+	( set -o posix ; set ) | sort >"$tmp_dir/vars.after"
 
 
 	doLog "INFO # --------------------------------------"
@@ -377,7 +377,7 @@ doSetVars(){
 		
 		exit_code=0
 		doLog "INFO using the following vars:"
-		cmd="$(comm --nocheck-order -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
+		cmd="$(comm -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
 		echo -e "$cmd"
 
 		# and clear the screen
@@ -407,7 +407,7 @@ doParseConfFile(){
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
 	test -z "$1" || cnf_file=$1;shift 1;
-	#debug echo "@doParseConfFile cnf_file:: $cnf_file" ; sleep 6
+	#debug echo "@doParseConfFile cnf_file:: $cnf_file" 
 	# coud be later on parametrized ... 
 	INI_SECTION=MainSection
 

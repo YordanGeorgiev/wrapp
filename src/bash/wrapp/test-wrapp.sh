@@ -52,7 +52,6 @@ get_function_list () {
 # run all the actions
 #------------------------------------------------------------------------------
 doRunTests(){
-
 	cd $product_instance_dir
 
    doLogTestRunEntry 'INIT'
@@ -67,10 +66,8 @@ doRunTests(){
 		doLog "INFO START :: testing action: \"$action\""
       doLogTestRunEntry 'START'
 		while read -r test_file ; do (
-
 			# doLog "test_file: \"$test_file\""
 			while read -r function_name ; do (
-
 				action_name=`echo $(basename $test_file)|sed -e 's/.test.sh//g'`
             
             if [ "$action_name" != "$action" ]
@@ -110,10 +107,10 @@ doRunTests(){
 #------------------------------------------------------------------------------
 doInit(){
    call_start_dir=`pwd`
-   wrap_bash_dir=`dirname $(readlink -f $0)`
+   wrap_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
    tmp_dir="$wrap_bash_dir/tmp/.tmp.$$"
    mkdir -p "$tmp_dir"
-   ( set -o posix ; set ) >"$tmp_dir/vars.before"
+   ( set -o posix ; set ) | sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    wrap_name_tester=${my_name_ext%.*}
    test $OSTYPE = 'cygwin' && host_name=`hostname -s`
@@ -168,8 +165,8 @@ doExit(){
 # doLog "DEBUG some debug message"
 #------------------------------------------------------------------------------
 doLog(){
-   type_of_msg=$(echo $*|cut -d" " -f1)
-   msg="$(echo $*|cut -d" " -f2-)"
+   type_of_msg=$(echo $*|cut -d " " -f1)
+   msg="$(echo $*|cut -d " " -f2-)"
    [[ $type_of_msg == DEBUG ]] && [[ $do_print_debug_msgs -ne 1 ]] && return
    [[ $type_of_msg == INFO ]] && type_of_msg="INFO "
 
@@ -271,8 +268,8 @@ doSetVars(){
 	#while read -r test_file ; do echo "$test_file" ; done < <(find . -name "*test.sh")
    
 	# this will be dev , tst, prd
-   env_type=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f5)
-	product_version=$(echo `basename "$product_instance_dir"`|cut --delimiter='.' -f2-4)
+   env_type=$(echo `basename "$product_instance_dir"`|cut -d'.' -f5)
+	product_version=$(echo `basename "$product_instance_dir"`|cut -d'.' -f2-4)
 	environment_name=$(basename "$product_instance_dir")
 
 	cd ..
@@ -295,7 +292,7 @@ doSetVars(){
 
 
 	doParseConfFile
-	( set -o posix ; set ) >"$tmp_dir/vars.after"
+	( set -o posix ; set ) | sort >"$tmp_dir/vars.after"
 
 
 	doLog "INFO # --------------------------------------"
@@ -306,7 +303,7 @@ doSetVars(){
 		
 	exit_code=0
 	doLog "INFO using the following vars:"
-	cmd="$(comm --nocheck-order -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
+	cmd="$(comm -3 $tmp_dir/vars.before $tmp_dir/vars.after | perl -ne 's#\s+##g;print "\n $_ "' )"
 	echo -e "$cmd"
 
 	# and clear the screen
