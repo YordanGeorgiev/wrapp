@@ -10,10 +10,10 @@ umask 022    ;
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
 trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
-trap "exit 1" TERM
+trap "exit $exit_code" TERM
 export TOP_PID=$$
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ main(){
 #eof main
 
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # the "reflection" func
 #------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ doRunTests(){
 #eof fun doRunTests
 
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ doExit(){
 }
 #eof func doExit
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -200,7 +200,7 @@ doCleanAfterRun(){
 #eof func doCleanAfterRun
 
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -221,7 +221,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -244,7 +244,7 @@ doRunCmdOrExit(){
 #eof func doRunCmdOrExit
 
 
-# v1.1.3 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
@@ -312,7 +312,7 @@ doSetVars(){
 #eof func doSetVars
 
 
-# v1.1.3
+# v1.2.5
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection

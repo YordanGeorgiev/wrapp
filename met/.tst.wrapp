@@ -15,6 +15,7 @@ src/bash/wrapp/tmp
 src/bash/wrapp/wrapp.cnf
 src/bash/wrapp/wrapp.doc-pub-host.cnf
 src/bash/wrapp/wrapp.set-your-host.cnf
+src/bash/wrapp/wrapp.CMac.cnf
 1
 src/sql/mysql/run/select-all-from-%db%.%table%.SQL
 src/sql/mysql/run/delete-all-from-%db%.%table%.SQL
@@ -246,3 +247,4 @@ src/bash/wrapp/tests/log-test-run-entry.test.sh
 src/bash/wrapp/helps/log-test-run-entry.help.sh
 dat/tests/1
 1
+tags

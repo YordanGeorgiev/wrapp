@@ -21,7 +21,7 @@ doCreateRelativePackage(){
 	test -f $include_file || \
 		doExit 3 "did not found any deployment file paths containing deploy file @ $include_file"
 
-   tgt_env_type=$(echo `basename "$include_file"`|cut --delimiter='.' -f2)
+   tgt_env_type=$(echo `basename "$include_file"`|cut -d'.' -f2)
 
 	timestamp=`date "+%Y%m%d_%H%M%S"`
 	# the last token of the include_file with . token separator - thus no points in names
