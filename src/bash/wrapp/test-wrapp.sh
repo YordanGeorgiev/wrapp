@@ -13,7 +13,7 @@ trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
 trap "exit $exit_code" TERM
 export TOP_PID=$$
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ main(){
 #eof main
 
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # the "reflection" func
 #------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ doRunTests(){
 #eof fun doRunTests
 
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
@@ -113,8 +113,7 @@ doInit(){
    ( set -o posix ; set ) | sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    wrap_name_tester=${my_name_ext%.*}
-   test $OSTYPE = 'cygwin' && host_name=`hostname -s`
-   test $OSTYPE != 'cygwin' && host_name=`hostname`
+   host_name=`hostname -s`
 }
 #eof doInit
 
@@ -156,7 +155,7 @@ doExit(){
 }
 #eof func doExit
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -200,7 +199,7 @@ doCleanAfterRun(){
 #eof func doCleanAfterRun
 
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -221,7 +220,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -244,7 +243,7 @@ doRunCmdOrExit(){
 #eof func doRunCmdOrExit
 
 
-# v1.2.5 
+# v1.2.6 
 #------------------------------------------------------------------------------
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
@@ -312,7 +311,7 @@ doSetVars(){
 #eof func doSetVars
 
 
-# v1.2.5
+# v1.2.6
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection

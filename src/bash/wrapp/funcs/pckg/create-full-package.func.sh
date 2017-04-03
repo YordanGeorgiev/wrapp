@@ -66,7 +66,11 @@ doCreateFullPackage(){
 	doLog "INFO created the following full development package:"
 	doLog "INFO `stat -c \"%y %n\" $zip_file`"
 
-	test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_file $network_backup_dir/"
+
+   test -d $network_backup_dir || mkdir -p "$network_backup_dir/"
+   test -d $network_backup_dir || \
+      doLog "ERROR failed to create network_backup_dir $network_backup_dir"
+   test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_file $network_backup_dir/"
 
 	doLog "INFO === STOP  === create-full-package" ;
 }

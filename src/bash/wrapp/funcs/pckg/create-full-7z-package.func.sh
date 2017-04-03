@@ -69,7 +69,10 @@ doCreateFull7zPackage(){
 	doLog "INFO created the following full 7z package:"
 	doLog "INFO $zip_7z_file"
 
-	test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_7z_file $network_backup_dir/"
+   test -d $network_backup_dir || mkdir -p "$network_backup_dir/"
+   test -d $network_backup_dir || \
+      doLog "ERROR failed to create network_backup_dir $network_backup_dir"
+   test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_7z_file $network_backup_dir/"
 
 	doLog "INFO STOP  ::: create-full-7z-package" ;
 }
