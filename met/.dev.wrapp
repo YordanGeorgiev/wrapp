@@ -84,10 +84,8 @@ doc/txt/wrapp/helps/sys/tmux/save-tmux-session.help.txt
 doc/txt/wrapp/specs/save-tmux-session.spec.txt
 doc/txt/wrapp/specs/sys/tmux/save-tmux-session.spec.txt
 doc/txt/wrapp/tests/save-tmux-session.test.txt
-src/bash/wrapp/funcs/save-tmux-session.func.sh
 src/bash/wrapp/funcs/sys/tmux/save-tmux-session.func.sh
 src/bash/wrapp/specs/save-tmux-session.spec.sh
-src/bash/wrapp/specs/sys/tmux/save-tmux-session.spec.sh
 src/bash/wrapp/tests/save-tmux-session.test.sh
 src/bash/wrapp/tests/sys/tmux/save-tmux-session.test.sh
 1
