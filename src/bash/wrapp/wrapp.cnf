@@ -4,7 +4,7 @@
 #use simple var_name=var_value syntax 
 
 #the name of this application 
-wrap_name=wrapp
+run_unit=wrapp
 
 #the name of this application's db
 db_name=dev_wrapp

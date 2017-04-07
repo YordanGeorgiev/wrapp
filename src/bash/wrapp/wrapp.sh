@@ -40,7 +40,7 @@ main(){
 	doSetVars
 	doCheckReadyToStart
 	doRunActions "$@"
-	doExit 0 "# = STOP  MAIN = $wrap_name "
+	doExit 0 "# = STOP  MAIN = $run_unit "
 }
 #eof main
 
@@ -113,12 +113,12 @@ doRunActions(){
 #------------------------------------------------------------------------------
 doInit(){
    call_start_dir=`pwd`
-   wrap_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
-   tmp_dir="$wrap_bash_dir/tmp/.tmp.$$"
+   run_unit_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
+   tmp_dir="$run_unit_bash_dir/tmp/.tmp.$$"
    mkdir -p "$tmp_dir"
    ( set -o posix ; set )| sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
-   wrap_name=${my_name_ext%.*}
+   run_unit=${my_name_ext%.*}
    host_name=`hostname -s`
 }
 #eof doInit
@@ -138,7 +138,7 @@ doParseCmdArgs(){
          actions="$actions$OPTARG "
          ;;
       c)
-         export wrap_name="$OPTARG "
+         export run_unit="$OPTARG "
          ;;
       i)
          include_file="$OPTARG"
@@ -170,11 +170,11 @@ doCreateDefaultConfFile(){
 	echo -e "[MainSection] \n" >> $cnf_file
 	echo -e "#use simple var_name=var_value syntax \n">>$cnf_file
 	echo -e "#the name of this application ">>$cnf_file
-	echo -e "app_name=$wrap_name\n" >> $cnf_file
+	echo -e "app_name=$run_unit\n" >> $cnf_file
 	echo -e "#the e-mails to send the package to ">>$cnf_file
 	echo -e "Emails=some.email@company.com\n" >> $cnf_file
 	echo -e "#the name of this application's db" >> $cnf_file
-	echo -e "db_name=$env_type""_""$wrap_name\n\n" >> $cnf_file
+	echo -e "db_name=$env_type""_""$run_unit\n\n" >> $cnf_file
 	echo -e "#eof file: $cnf_file" >> $cnf_file
 
 }
@@ -225,11 +225,11 @@ doExit(){
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
       >&2 echo "$exit_msg"
       # doSendReport
-      doLog "FATAL STOP FOR $wrap_name RUN with: "
+      doLog "FATAL STOP FOR $run_unit RUN with: "
       doLog "FATAL exit_code: $exit_code exit_msg: $exit_msg"
    else
-      doLog "INFO  STOP FOR $wrap_name RUN with: "
-      doLog "INFO  STOP FOR $wrap_name RUN: $exit_code $exit_msg"
+      doLog "INFO  STOP FOR $run_unit RUN with: "
+      doLog "INFO  STOP FOR $run_unit RUN: $exit_code $exit_msg"
    fi
 
 
@@ -261,8 +261,8 @@ doLog(){
    # define default log file none specified in cnf file
    test -z $log_file && \
 		mkdir -p $product_instance_dir/dat/log/bash && \
-			log_file="$product_instance_dir/dat/log/bash/$wrap_name.`date "+%Y%m"`.log"
-   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$wrap_name][@$host_name] [$$] $msg " >> $log_file
+			log_file="$product_instance_dir/dat/log/bash/$run_unit.`date "+%Y%m"`.log"
+   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$run_unit][@$host_name] [$$] $msg " >> $log_file
 }
 #eof func doLog
 
@@ -280,7 +280,7 @@ doCleanAfterRun(){
 
 #   while read -r f ; do 
 #      test -f $f && rm -fv "$f" ; 
-#   done < <(find "$wrap_bash_dir" -type f -name '*.bak')
+#   done < <(find "$run_unit_bash_dir" -type f -name '*.bak')
 }
 #eof func doCleanAfterRun
 
@@ -334,7 +334,7 @@ doRunCmdOrExit(){
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
 doSetVars(){
-   cd $wrap_bash_dir
+   cd $run_unit_bash_dir
    for i in {1..3} ; do cd .. ; done ;
    export product_instance_dir=`pwd`;
 	# include all the func files to fetch their funcs 
@@ -342,9 +342,10 @@ doSetVars(){
 	# while read -r func_file ; do echo "$func_file" ; done < <(find . -name "*func.sh")
 
    # this will be dev , tst, prd
-   env_type=$(echo `basename "$product_instance_dir"`|cut -d'.' -f5)
+   product_name=$(echo `basename "$product_instance_dir"`|cut -d'.' -f1)
 	product_version=$(echo `basename "$product_instance_dir"`|cut -d'.' -f2-4)
-	environment_name=$(basename "$product_instance_dir")
+   env_type=$(echo `basename "$product_instance_dir"`|cut -d'.' -f5)
+	product_instance_env_name=$(basename "$product_instance_dir")
 
 	cd ..
 	product_dir=`pwd`;
@@ -358,19 +359,20 @@ doSetVars(){
 	cd ..
 	org_base_dir=`pwd`;
 
-	cd "$wrap_bash_dir/"
+	cd "$run_unit_bash_dir/"
 
    # start set default vars
    do_print_debug_msgs=0
    # stop set default vars
-
+   
+   sleep 10
 	doParseConfFile
 	( set -o posix ; set ) | sort >"$tmp_dir/vars.after"
 
 
 	doLog "INFO # --------------------------------------"
 	doLog "INFO # -----------------------"
-	doLog "INFO # ===		 START MAIN   === $wrap_name"
+	doLog "INFO # ===		 START MAIN   === $run_unit"
 	doLog "INFO # -----------------------"
 	doLog "INFO # --------------------------------------"
 		
@@ -393,15 +395,15 @@ doSetVars(){
 #------------------------------------------------------------------------------
 doParseConfFile(){
 	# set a default cnfiguration file
-	cnf_file="$wrap_bash_dir/$wrap_name.cnf"
+	cnf_file="$run_unit_bash_dir/$run_unit.cnf"
 
 	# however if there is a host dependant cnf file override it
-	test -f "$wrap_bash_dir/$wrap_name.$host_name.cnf" \
-		&& cnf_file="$wrap_bash_dir/$wrap_name.$host_name.cnf"
+	test -f "$run_unit_bash_dir/$run_unit.$host_name.cnf" \
+		&& cnf_file="$run_unit_bash_dir/$run_unit.$host_name.cnf"
 	
 	# if we have perl apps they will share the same cnfiguration settings with this one
-	test -f "$product_instance_dir/$wrap_name.$host_name.cnf" \
-		&& cnf_file="$product_instance_dir/$wrap_name.$host_name.cnf"
+	test -f "$product_instance_dir/$run_unit.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/$run_unit.$host_name.cnf"
 
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
