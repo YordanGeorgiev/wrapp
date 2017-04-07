@@ -1,11 +1,11 @@
-create-full-package
+# create-full-package
 # log-test-run-entry
 # gmail-package
 # create-full-7z-package
 # create-relative-package
 # create-relative-7z-package
 # clone-to-app
-# morph-dir
+morph-dir
 # change-env-type
 # change-version
 # restore-tmux-session
