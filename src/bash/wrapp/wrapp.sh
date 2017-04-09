@@ -197,29 +197,12 @@ doCheckReadyToStart(){
 }
 #eof func doCheckReadyToStart
 
-
-
-
-
-# v1.0.8
+# v1.2.7
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
 doExit(){
-   #set -x
-   exit_code=0
-   exit_msg="$*"
-
-   doCleanAfterRun
-
-   echo -e "\n\n"
-	cd $call_start_dir
-
-   case $1 in [0-9])
-      exit_code="$1";
-      export exit_code=$1
-      shift 1;
-   esac
+   exit_msg="${exit_msg#* }"
 
    if (( $exit_code != 0 )); then
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
@@ -232,11 +215,13 @@ doExit(){
       doLog "INFO  STOP FOR $run_unit RUN: $exit_code $exit_msg"
    fi
 
+   doCleanAfterRun
+   cd $call_start_dir
 
    #src: http://stackoverflow.com/a/9894126/65706
    test $exit_code -ne 0 && kill -s TERM $TOP_PID
    test $exit_code -eq 0 && exit 0
-   
+
 }
 #eof func doExit
 
