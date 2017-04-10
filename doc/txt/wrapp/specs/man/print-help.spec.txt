@@ -93,7 +93,7 @@ doPrintHelp(){
       - printing help with cmd switch -h ( verify with doTestHelp in test-sh )
       - prints the set in the script variables set during run-time
       - separation of host specific vars into separate cnfiguration file :
-       <<wrap_bash_dir>>/<<run_unit>>.<<MyHost>>.cnf
+       <<run_unit_bash_dir>>/<<run_unit>>.<<MyHost>>.cnf
        $ini_file
       - thus easier enabling portability between hosts
       - logging on terminal and into cnfigurable log file set now as:

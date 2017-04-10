@@ -350,7 +350,6 @@ doSetVars(){
    do_print_debug_msgs=0
    # stop set default vars
    
-   sleep 10
 	doParseConfFile
 	( set -o posix ; set ) | sort >"$tmp_dir/vars.after"
 
