@@ -30,6 +30,14 @@ doMorphDir(){
 			#debug doLog doing find and replace in $file 
 			doLog "DEBUG working on file: $file"
 			doLog "DEBUG searching for $to_srch , replacing with :: $to_repl"
+
+         # we do not want to mess with out .git dir
+         # or how-to check that a string contains another string
+         case "$file" in 
+            *.git*)
+            continue
+            ;;
+         esac
 			perl -pi -e "s#$to_srch#$to_repl#g" "$file"
 		);
 		done < <(find $dir_to_morph -type f -exec file {} \; | grep text | cut -d: -f1)
