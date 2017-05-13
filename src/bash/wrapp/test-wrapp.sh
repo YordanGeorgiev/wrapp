@@ -13,7 +13,7 @@ trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
 trap "exit $exit_code" TERM
 export TOP_PID=$$
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ main(){
 #eof main
 
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # the "reflection" func
 #------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ get_function_list () {
 
 
 #
-# v1.1.4
+# v1.2.7
 #------------------------------------------------------------------------------
 # run all the actions
 #------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ doRunTests(){
 				   # and clear the screen
 		         doLog "INFO STOP :: testing action: \"$action\""
                # test $exit_code -ne 0 && doExit $exit_code "FATAL $function_name"
-				   test -z "$sleep_interval" || sleep $sleep_interval
+				   sleep $sleep_interval
 				   printf "\033[2J";printf "\033[0;0H"
             fi
 			);
@@ -101,7 +101,7 @@ doRunTests(){
 #eof fun doRunTests
 
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
@@ -113,12 +113,13 @@ doInit(){
    ( set -o posix ; set ) | sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    run_unit_tester=${my_name_ext%.*}
-   host_name=`hostname -s`
+   host_name=$(hostname -s)
+   ${sleep_interval:=0}    # to enable slower execution export sleep_interval=3
 }
 #eof doInit
 
 
-# v1.0.8
+# v1.2.7
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
@@ -155,7 +156,7 @@ doExit(){
 }
 #eof func doExit
 
-# v1.2.6 
+# v1.2.7
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -181,7 +182,7 @@ doLog(){
 #eof func doLog
 
 
-#v1.1.0
+#v1.2.7
 #------------------------------------------------------------------------------
 # cleans the unneeded during after run-time stuff
 # do put here the after cleaning code
@@ -199,7 +200,7 @@ doCleanAfterRun(){
 #eof func doCleanAfterRun
 
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -220,7 +221,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -243,12 +244,11 @@ doRunCmdOrExit(){
 #eof func doRunCmdOrExit
 
 
-# v1.2.6 
+# v1.2.7 
 #------------------------------------------------------------------------------
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
 doSetVars(){
-	test -z "$sleep_interval" && export sleep_iterval=3
    cd $run_unit_bash_dir
    for i in {1..3} ; do cd .. ; done ;
    export product_instance_dir=`pwd`;
@@ -311,7 +311,7 @@ doSetVars(){
 #eof func doSetVars
 
 
-# v1.2.6
+# v1.2.7
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection

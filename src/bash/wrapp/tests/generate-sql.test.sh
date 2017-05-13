@@ -10,7 +10,7 @@ doTestGenerateSQL(){
 	
 	cat doc/txt/wrapp/tests/generate-sql.test.txt
 	
-	test -z "$sleep_interval" || sleep "$sleep_interval"
+	sleep "$sleep_interval"
 	# add your action implementation code here ... 
 	# Action !!!
    bash src/bash/wrapp/wrapp.sh -a generate-sql

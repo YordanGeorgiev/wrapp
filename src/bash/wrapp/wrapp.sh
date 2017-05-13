@@ -119,7 +119,8 @@ doInit(){
    ( set -o posix ; set )| sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    run_unit=${my_name_ext%.*}
-   host_name=`hostname -s`
+   host_name=$(hostname -s)
+   ${sleep_interval:=0}    # to enable slower execution export sleep_interval=3
 }
 #eof doInit
 

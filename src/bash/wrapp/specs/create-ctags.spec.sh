@@ -10,7 +10,7 @@ doSpecCreateCtags(){
 	
 	cat doc/txt/wrapp/specs/create-ctags.spec.txt
 	
-	test -z "$sleep_interval" || sleep "$sleep_interval"
+	sleep "$sleep_interval"
 	# add your action implementation code here ... 
 	# Action !!!
 

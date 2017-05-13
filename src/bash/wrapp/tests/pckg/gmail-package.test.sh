@@ -9,10 +9,10 @@ doTestGmailPackage(){
 	doLog "DEBUG START doTestGmailPackage"
 	
    cat doc/txt/wrapp/tests/pckg/gmail-package.test.txt
-	test -z "$sleep_interval" || sleep "$sleep_interval"
+	sleep "$sleep_interval"
 
 	bash src/bash/wrapp/wrapp.sh -a create-full-package -a gmail-package
-	test -z "$sleep_interval" || sleep "$sleep_interval"
+	sleep "$sleep_interval"
    printf "\033[2J";printf "\033[0;0H"
 
 	doLog "DEBUG STOP  doTestGmailPackage"
