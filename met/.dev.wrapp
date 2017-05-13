@@ -121,6 +121,7 @@ met/.dev.wrapp
 met/.tst.wrapp
 met/.prd.wrapp
 met/.git.wrapp
+met/.src.wrapp
 doc/txt/wrapp/helps/dev/clone-to-app.help.txt
 doc/txt/wrapp/specs/dev/clone-to-app.spec.txt
 src/bash/wrapp/funcs/dev/clone-to-app.func.sh
