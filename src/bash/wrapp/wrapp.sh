@@ -9,7 +9,6 @@ umask 022    ;
 # set -v
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
-trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
 trap "exit $exit_code" TERM
 export TOP_PID=$$
 
@@ -201,9 +200,15 @@ doCheckReadyToStart(){
 # v1.2.7
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
+# call from another function or subshell by: 
+# export exit_code=0 && doExit "ok msg" && exit 0
+# export exit_code=1 && doExit "NOK msg" && exit 1
+# note the prerequisite signal trap @ the beginning of the script:
+# trap "exit $exit_code" TERM
+# export TOP_PID=$$
 #------------------------------------------------------------------------------
 doExit(){
-   exit_msg="${exit_msg#* }"
+   exit_msg="$*"
 
    if (( $exit_code != 0 )); then
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
@@ -217,12 +222,14 @@ doExit(){
    fi
 
    doCleanAfterRun
-   cd $call_start_dir
+	cd $call_start_dir 
 
    #src: http://stackoverflow.com/a/9894126/65706
-   test $exit_code -ne 0 && kill -s TERM $TOP_PID
+   test $exit_code -ne 0 && kill -s TERM "$TOP_PID" && exit $exit_code
    test $exit_code -eq 0 && exit 0
 
+   # this should be overkill 
+   # test $exit_code -ne 0 && kill -9 "$TOP_PID"
 }
 #eof func doExit
 
