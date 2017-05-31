@@ -27,8 +27,8 @@ doCreateFull7zPackage(){
 	zip_7z_file_name=$(echo $include_file | rev | cut -d. -f 1 | rev)
 	zip_7z_file_name="$zip_7z_file_name.$product_version.$env_type.$timestamp.$host_name.7z"
 	zip_7z_file="$product_dir/$zip_7z_file_name"
-	mkdir -p $product_instance_dir/dat/$wrapp/tmp
-	echo $zip_7z_file>$product_instance_dir/dat/$wrapp/tmp/zip_7z_file
+	mkdir -p $product_instance_dir/dat/$run_unit/tmp
+	echo $zip_7z_file>$product_instance_dir/dat/$run_unit/tmp/zip_7z_file
 	set -x	
 
 	# start: add the perl_ignore_file_pattern
@@ -60,19 +60,16 @@ doCreateFull7zPackage(){
 	test $ret -ne 0 && doExit "non-existend file specified in the include file: $include_file "
 
 	# All  input  patterns must match at least one file and all input files found must be readable.
-	cat $include_file | sort -u | while read -r line ; do test -f "$org_name/$run_unit/$product_instance_env_name/$line" && echo $line ; done \
+	cat $include_file | sort -u | while read -r line ; do test -f "$org_name/$run_unit/$environment_name/$line" && echo $line ; done \
 		| grep -vP "$perl_ignore_file_pattern" | grep -vP '^\s*#' | perl -ne 's|\n|\000|g;print'| \
-		xargs -0 -I "{}" 7z u -r0 -m0=lzma2 -mx=5 -p"$pcking_pw" -w"$product_dir" "$zip_7z_file" "$org_name/$run_unit/$product_instance_env_name/{}"
+		xargs -0 -I "{}" 7z u -r0 -m0=lzma2 -mx=5 -p"$pcking_pw" -w"$product_dir" "$zip_7z_file" "$org_name/$run_unit/$environment_name/{}"
 
 	ret=$? 
 
 	doLog "INFO created the following full 7z package:"
 	doLog "INFO $zip_7z_file"
 
-   test -d $network_backup_dir || mkdir -p "$network_backup_dir/"
-   test -d $network_backup_dir || \
-      doLog "ERROR failed to create network_backup_dir $network_backup_dir"
-   test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_7z_file $network_backup_dir/"
+	test -d $network_backup_dir && doRunCmdAndLog "cp -v $zip_7z_file $network_backup_dir/"
 
 	doLog "INFO STOP  ::: create-full-7z-package" ;
 }

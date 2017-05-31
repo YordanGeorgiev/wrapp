@@ -3,23 +3,27 @@
 
 umask 022    ;
 
+# set -eu -o pipefail
+
 # print the commands
 # set -x
 # print each input line as well
 # set -v
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
-trap "exit $exit_code" TERM
+trap "exit 1" TERM
 export TOP_PID=$$
 
-
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
 main(){
 	doInit
-	case $1 in
+   
+   test -z "${1+x}" && arg='print-usage'
+
+	case $arg in
 		'-usage')
 		actions="print-usage "
 		;;
@@ -34,7 +38,7 @@ main(){
 		;;
 	esac
 
-	test -z "$actions" && doParseCmdArgs "$@"
+	test -z "${actions+x}" && doParseCmdArgs "$@"
 
 	doSetVars
 	doCheckReadyToStart
@@ -43,7 +47,7 @@ main(){
 }
 #eof main
 
-# v1.2.6 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # the "reflection" func - identify the the funcs per file
 #------------------------------------------------------------------------------
@@ -63,7 +67,7 @@ get_function_list () {
 
 
 
-# v1.2.6 
+# v1.2.5 
 #------------------------------------------------------------------------------
 # run all the actions
 #------------------------------------------------------------------------------
@@ -106,7 +110,7 @@ doRunActions(){
 #eof func doRunActions
 
 
-#v1.2.6 
+#v 1.2.5 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
@@ -119,13 +123,13 @@ doInit(){
    my_name_ext=`basename $0`
    run_unit=${my_name_ext%.*}
    host_name=$(hostname -s)
-   ${sleep_interval:=0}    # to enable slower execution export sleep_interval=3
+: "${sleep_interval:=0}"
 }
 #eof doInit
 
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # parse the single letter command line args
 #------------------------------------------------------------------------------
@@ -160,7 +164,7 @@ doParseCmdArgs(){
 
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # create an example host dependant ini file
 #------------------------------------------------------------------------------
@@ -181,7 +185,7 @@ doCreateDefaultConfFile(){
 #eof func doCreateDefaultConfFile
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # perform the checks to ensure that all the vars needed to run are set
 #------------------------------------------------------------------------------
@@ -197,15 +201,16 @@ doCheckReadyToStart(){
 }
 #eof func doCheckReadyToStart
 
+
+
+
+
 # v1.2.7
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
-# call from another function or subshell by: 
-# export exit_code=0 && doExit "ok msg" && exit 0
-# export exit_code=1 && doExit "NOK msg" && exit 1
-# note the prerequisite signal trap @ the beginning of the script:
-# trap "exit $exit_code" TERM
-# export TOP_PID=$$
+# call by: 
+# export exit_code=0 ; doExit "ok msg"
+# export exit_code=1 ; doExit "NOK msg"
 #------------------------------------------------------------------------------
 doExit(){
    exit_msg="$*"
@@ -227,14 +232,12 @@ doExit(){
    #src: http://stackoverflow.com/a/9894126/65706
    test $exit_code -ne 0 && kill -s TERM "$TOP_PID" && exit $exit_code
    test $exit_code -eq 0 && exit 0
-
-   # this should be overkill 
-   # test $exit_code -ne 0 && kill -9 "$TOP_PID"
+   #test $exit_code -ne 0 && kill -9 "$TOP_PID"
 }
 #eof func doExit
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -259,6 +262,27 @@ doLog(){
 }
 #eof func doLog
 
+# v1.2.5 
+#------------------------------------------------------------------------------
+# echo pass params and print them to a log file and terminal
+# with timestamp and $host_name and $0 PID
+# usage:
+# doLog "INFO some info message"
+# doLog "DEBUG some debug message"
+#------------------------------------------------------------------------------
+doRunLog(){
+   uuid="$*"
+
+   # print to the terminal if we have one
+   # test -t 1 && echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [wrapp][@$host_name] [$$] $msg "
+
+   # define default log file none specified in cnf file
+   test -z $run_log_file && \
+		mkdir -p $product_instance_dir/dat/log && \
+			export run_log_file="$product_instance_dir/dat/log/$run_unit.`date "+%Y%m%d_%H%M%S"`.run.log"
+   echo "`date "+%Y-%m-%d - %H:%M:%S"` $uuid " >> $run_log_file
+}
+#eof func doLog
 
 #v1.1.0
 #------------------------------------------------------------------------------
@@ -278,7 +302,7 @@ doCleanAfterRun(){
 #eof func doCleanAfterRun
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -299,7 +323,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-#v1.2.6 
+#v1.2.5 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -379,7 +403,47 @@ doSetVars(){
 #eof func doSetVars
 
 
-#v1.2.6
+#------------------------------------------------------------------------------
+# set vars from the cnf file, but only if they are not pre-set in the calling shell
+#------------------------------------------------------------------------------
+doSetUndefinedShellVarsFromCnfFile(){
+
+	# set a default cnfiguration file
+	cnf_file="$run_unit_bash_dir/$run_unit.cnf"
+
+	# however if there is a host dependant cnf file override it
+	test -f "$run_unit_bash_dir/$run_unit.$host_name.cnf" \
+		&& cnf_file="$run_unit_bash_dir/$run_unit.$host_name.cnf"
+	
+	# if we have perl apps they will share the same cnfiguration settings with this one
+	test -f "$product_instance_dir/$run_unit.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/$run_unit.$host_name.cnf"
+   
+   # however if there is a host dependant and env-aware cnf file override it
+	test -f "$product_instance_dir/$run_unit.$env_type.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/$run_unit.$env_type.$host_name.cnf"
+
+	INI_SECTION=MainSection
+
+	vars_to_set=`sed -e 's/[[:space:]]*\=[[:space:]]*/=/g' \
+		-e 's/#.*$//' \
+		-e 's/[[:space:]]*$//' \
+		-e 's/^[[:space:]]*//' \
+      -e "s/^\(.*\)=\([^\"']*\)$/test -z \"\$\1\" \&\& export \1=\"\2\"/" \
+		< $cnf_file \
+		| sed -n -e "/^\[$INI_SECTION\]/,/^\s*\[/{/^[^#].*\=.*/p;}"`
+   
+   while IFS=' ' read -r var_to_set
+   do
+      echo "running: $var_to_set"
+      eval "$var_to_set"
+   done < "$vars_to_set"
+
+   vars_to_set=""
+}
+#eof func doSetShellVarsFromCnfFile
+
+# v1.2.5
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection
@@ -394,8 +458,12 @@ doParseConfFile(){
 		&& cnf_file="$run_unit_bash_dir/$run_unit.$host_name.cnf"
 	
 	# if we have perl apps they will share the same cnfiguration settings with this one
-	test -f "$product_instance_dir/$run_unit.$host_name.cnf" \
-		&& cnf_file="$product_instance_dir/$run_unit.$host_name.cnf"
+	test -f "$product_instance_dir/cnf/$run_unit.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/cnf/$run_unit.$host_name.cnf"
+	
+   # if we have perl apps they will share the same cnfiguration settings with this one
+	test -f "$product_instance_dir/cnf/$run_unit.$env_type.$host_name.cnf" \
+		&& cnf_file="$product_instance_dir/cnf/$run_unit.$env_type.$host_name.cnf"
 
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
@@ -447,4 +515,4 @@ main "$@"
 # 1.0.0 --- 2016-09-11 12:24:15 -- init from bash-stub
 #----------------------------------------------------------
 #
-#eof file: wrapp.sh v1.2.6
+#eof file: wrapp.sh v1.2.5

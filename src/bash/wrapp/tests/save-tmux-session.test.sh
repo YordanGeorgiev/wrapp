@@ -8,7 +8,7 @@ doTestSaveTmuxSession(){
 
 	doLog "DEBUG START doTestSaveTmuxSession"
 	
-	cat doc/txt/wrapp/test/save-tmux-session.test.txt
+	cat doc/txt/wrapp/tmpl/save-tmux-session.test.txt
 	sleep 2
 	# add your action implementation code here ... 
 

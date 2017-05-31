@@ -46,7 +46,6 @@ doMorphDir(){
 
 		#search and repl %var_id% with var_id_val in deploy_tmp_dir 
 		doLog "INFO search and replace in dir and file paths dir_to_morph:$dir_to_morph"
-
       # rename the dirs according to the pattern
       while read -r dir ; do (
          perl -nle '$o=$_;s#'"$to_srch"'#'"$to_repl"'#g;$n=$_;`mkdir -p $n` ;'

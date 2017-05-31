@@ -85,3 +85,4 @@ doCreateFullPackage(){
 	doLog "INFO STOP  create-full-package.func.sh" ;
 }
 #eof func doCreateFullPackage
+

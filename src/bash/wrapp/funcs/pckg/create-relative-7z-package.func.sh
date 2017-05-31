@@ -59,8 +59,8 @@ doCreateRelative7zPackage(){
 	zip_7z_file_name=$(echo $include_file | rev | cut -d. -f 1 | rev)
 	zip_7z_file_name="$zip_7z_file_name.$product_version.$env_type.$timestamp.$host_name.rel.7z"
 	zip_7z_file="$product_dir/$zip_7z_file_name"
-	mkdir -p $product_instance_dir/dat/$wrapp/tmp
-	echo $zip_7z_file>$product_instance_dir/dat/$wrapp/tmp/zip_7z_file
+	mkdir -p $product_instance_dir/dat/$run_unit/tmp
+	echo $zip_7z_file>$product_instance_dir/dat/$run_unit/tmp/zip_7z_file
 	
 	# All  input  patterns must match at least one file and all input files found must be readable.
 	# 7z does recursively include all the contents of the dirs - and we want exactly the oppposite
@@ -78,15 +78,22 @@ doCreateRelative7zPackage(){
 	doLog "INFO created the following relative package:"
 	doLog "INFO `stat -c \"%y %n\" $zip_7z_file_name`"
 
+   if [ -d "$network_backup_dir" ]; then
+      cmd="cp -v $zip_7z_file $product_dir/dat/zip/" && doRunCmdOrExit "$cmd"
+      doLog "INFO with the following local backup  :"
+      doLog "INFO `stat -c \"%y %n\" $product_dir/dat/zip/$zip_7z_file_name`"
+      doLog "INFO in the network dir @::"
+      doLog "INFO :: $network_backup_dir"
+      cmd="cp -v $zip_7z_file $network_backup_dir/$zip_7z_file_name" && doRunCmdOrExit "$cmd"
+      doLog "INFO with the following network backup  :"
+      doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_7z_file_name\"`"
+   else
+      msg="skip backup as network_backup_dir is not configured"
+      doLog "INFO $msg"
+   fi
+
+
 	mkdir -p $network_backup_dir && \
-	cmd="cp -v $zip_7z_file $product_dir/dat/zip/" && doRunCmdOrExit "$cmd" && \
-	doLog "INFO with the following local backup  :" && \
-	doLog "INFO `stat -c \"%y %n\" $product_dir/dat/zip/$zip_7z_file_name`" && \
-	doLog "INFO in the network dir @::" && \
-	doLog "INFO :: $network_backup_dir" && \
-	cmd="cp -v $zip_7z_file $network_backup_dir/$zip_7z_file_name" && doRunCmdOrExit "$cmd" && \
-	doLog "INFO with the following network backup  :" && \
-	doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_7z_file_name\"`"
 
 	doLog "INFO :: STOP  :: create-relative-7z-package.func"
 
