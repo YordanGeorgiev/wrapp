@@ -50,7 +50,7 @@ doCreateFullPackage(){
 	# All  input  patterns must match at least one file and all input files found must be readable.
 	set -x ; ret=1
 	cat $include_file | egrep -v "$perl_ignore_file_pattern" | sed '/^#/ d' | perl -ne 's|\n|\000|g;print'| \
-	xargs -0 -I "{}" zip -MM $zip_file "$org_name/$run_unit/$environment_name/{}"
+	xargs -0 -I "{}" zip -MM $zip_file "$org_name/$run_unit/$product_instance_env_name/{}"
 	ret=$? 
 	set +x
 	test $ret -gt 0 && (
