@@ -10,7 +10,7 @@ doHelpRemovePackage(){
 	
 	cat doc/txt/wrapp/helps/remove-package.help.txt
 	
-	sleep "$sleep_interval"
+	test -z "$sleep_interval" || sleep "$sleep_interval"
 	# add your action implementation code here ... 
 	# Action !!!
 

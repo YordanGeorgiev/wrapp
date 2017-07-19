@@ -1,37 +1,35 @@
-# doc/txt/wrapp/remove-package-files/remove-package-files.func.txt
+# doc/txt/enricher/remove-package-files/remove-package-files.func.txt
 
-	doRemovePackageFiles
-	
-	# Purpose:
-	# ------------------------------------------------------
-	-- todo: what is the purpose of the doRemovePackageFiles function
+   doRemovePackageFiles
 
-	# Prequisites
-	# ------------------------------------------------------
-	-- todo: what are the prerequisites of the doRemovePackageFiles function
+   # Purpose:
+   # ------------------------------------------------------
+   remove the deployed package files of the product instance
 
-	# Installation
-	# ------------------------------------------------------
-	-- todo: what are the required installations for the  
-		doRemovePackageFiles function to execute without errors
+   # Prequisites
+   # ------------------------------------------------------
 
-	# Interdependancies
-	# ------------------------------------------------------
-	-- todo: what are the interdependancies for the  
-		doRemovePackageFiles function to execute without errors
+   # Installation
+   # ------------------------------------------------------
+   default deployment
 
-	# Usage:
-	# ------------------------------------------------------
-	-- todo: how can be the doRemovePackageFiles used 
+   # Interdependancies
+   # ------------------------------------------------------
+   - the include file
 
-	# Developent
-	# ------------------------------------------------------
-	-- todo: what issues, todos could be pointed for development
+   # Usage:
+   # ------------------------------------------------------
+   $0 -a remove-package-files
 
-	# Caveats:
-	# ------------------------------------------------------
-	-- todo: what are the known caveats of the doRemovePackageFiles functions
+   # Issues
+   # ------------------------------------------------------
+   more testing ...
+
+   # Caveats:
+   # ------------------------------------------------------
+   properly hairy things could occur because this is not tested
+   enough
 
 
 
-# eof file: doc/txt/wrapp/remove-package-files/remove-package-files.func.txt
+# eof file: doc/txt/enricher/remove-package-files/remove-package-files.func.txt
