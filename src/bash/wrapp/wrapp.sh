@@ -119,7 +119,6 @@ doInit(){
    run_unit_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
    tmp_dir="$run_unit_bash_dir/tmp/.tmp.$$"
    mkdir -p "$tmp_dir"
-   ( set -o posix ; set )| sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
    run_unit=${my_name_ext%.*}
    host_name=$(hostname -s)
@@ -171,7 +170,7 @@ doParseCmdArgs(){
 doCreateDefaultConfFile(){
 
 	echo -e "#file: $cnf_file \n\n" >> $cnf_file
-	echo -e "[MainSection] \n" >> $cnf_file
+	echo -e "[MAIN_SETTINGS] \n" >> $cnf_file
 	echo -e "#use simple var_name=var_value syntax \n">>$cnf_file
 	echo -e "#the name of this application ">>$cnf_file
 	echo -e "app_name=$run_unit\n" >> $cnf_file
@@ -423,7 +422,7 @@ doSetUndefinedShellVarsFromCnfFile(){
 	test -f "$product_instance_dir/$run_unit.$env_type.$host_name.cnf" \
 		&& cnf_file="$product_instance_dir/$run_unit.$env_type.$host_name.cnf"
 
-	INI_SECTION=MainSection
+	INI_SECTION='MAIN_SETTINGS'
 
 	vars_to_set=`sed -e 's/[[:space:]]*\=[[:space:]]*/=/g' \
 		-e 's/#.*$//' \
@@ -443,7 +442,7 @@ doSetUndefinedShellVarsFromCnfFile(){
 }
 #eof func doSetShellVarsFromCnfFile
 
-# v1.2.8
+# v1.2.9
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection
@@ -476,7 +475,7 @@ doParseConfFile(){
 
    # debug echo "@doParseConfFile cnf_file:: $cnf_file"
    # coud be later on parametrized ...
-   test -z "$ini_section" && ini_section=MainSection
+   test -z "$ini_section" && ini_section='MAIN_SETTINGS'
 
    doLog "DEBUG reading: the following configuration file"
    doLog "DEBUG ""$cnf_file"
