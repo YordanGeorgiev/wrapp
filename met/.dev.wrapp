@@ -12,10 +12,8 @@ cnf/hosts/doc-pub-host
 cnf/hosts/doc-pub-host/home
 cnf/hosts/doc-pub-host/home/ysg
 cnf/hosts/doc-pub-host/home/ysg/.muttrc
-cnf/hosts/doc-pub-host/home/ysg/.tmux.cnf
-cnf/hosts/doc-pub-host/home/ysg/.tmux.cnf.1.1.1.20161231_092125.backup
+cnf/hosts/doc-pub-host/home/ysg/.tmux.conf.1.1.4.20170721_140337.backup
 cnf/hosts/doc-pub-host/home/ysg/.tmux-session
-cnf/hosts/doc-pub-host/home/ysg/.tmux-session.1.0.0.20170531_133449.backup
 cnf/hosts/doc-pub-host/home/ysg/.vimrc.1.2.0.20161216_194801.backup
 cnf/wrapp.dev.doc-pub-host.cnf
 cnf/wrapp.doc-pub-host.cnf
@@ -290,3 +288,5 @@ doc/txt/wrapp/helps/remove-package-files.help.txt
 doc/txt/wrapp/funcs/remove-package-files.func.txt
 tags
 cnf/hosts/doc-pub-host/home/ysg/.tmux-session.1.0.0.20170531_133449.backup
+cnf/hosts/doc-pub-host/home/ysg/.tmux-session.1.0.0.20170721_140302.backup
+cnf/hosts/doc-pub-host/home/ysg/.tmux.conf.1.1.4.20170721_140337.backup
