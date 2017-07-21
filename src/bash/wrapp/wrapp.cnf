@@ -1,5 +1,5 @@
 #file: /opt/csitea/wrapp/wrapp.0.0.7.dev.ysg/src/bash/wrapp/wrapp.cnf 
-[MainSection]
+[MAIN_SETTINGS]
 
 #use simple var_name=var_value syntax 
 

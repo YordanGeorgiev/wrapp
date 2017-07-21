@@ -1,5 +1,5 @@
 # file: src/bash/wrapp/wrapp.doc-pub-host.cnf
-[MainSection]
+[MAIN_SETTINGS]
 
 #use simple var_name=var_value syntax 
 
