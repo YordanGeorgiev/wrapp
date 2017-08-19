@@ -10,6 +10,8 @@
 # ---------------------------------------------------------
 doRestoreTmuxSession(){
 
+   source "$product_instance_dir/src/bash/wrapp/funcs/sys/tmux/tmux-common.sh"
+
 	doCheckTmuxIsInstalled
 
 	tmux start-server

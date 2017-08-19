@@ -15,7 +15,7 @@ Table of Contents
     
 
 ## 1. What is it ?!
-A generic swiss knife wanna be bash / perl centric application wrapper for quicky packaging and deploying your tools, create new tools out of your existing ones , generating code for additonal functions, search and replace in both file paths and contents ... and all the rest not mentioned actions in the [sfw/bash/wrapp/tests](sfw/bash/wrapp/tests/all-wrapp-tests.lst) file ...
+A generic swiss knife wanna be bash / perl centric application wrapper for quicky packaging and deploying your tools, create new tools out of your existing ones , generating code for additonal functions, search and replace in both file paths and contents ... and all the rest not mentioned actions in the [src/bash/wrapp/tests](src/bash/wrapp/tests/all-wrapp-tests.lst) file ...
 
     
 
@@ -34,25 +34,28 @@ The nice to have are:
 
 The examples are for Ubuntu - use you OS package manager …
 
-    apt-get autoclean
-    apt-get install --only-upgrade bash
+    sudo apt-get autoclean
+    sudo apt-get install --only-upgrade bash
     
     sudo apt-get install -y perl
     
     # optionally 
     sudo apt-get install -y excuberant-ctags
-    sudo apt-get install -y 7z
+    sudo apt-get install -y zip unzip 7z
     
-    apt-get upgrade
+    sudo apt-get upgrade
 
 ### 2.2. Fetch the source
 Fetch the source from git hub as follows:
 
     # create your product dir:
-    mkdir -p /opt/csitea/wrapp
+    sudo mkdir -p /opt/csitea/wrapp
+    sudo chown -R $USER:$USER /opt/csitea/wrapp
     cd /opt/csitea/wrapp/
     
     # fetch the source
+    # this will work only if you have registered to GitHub: 
+    # if not check this link: https://help.github.com/articles/connecting-to-github-with-ssh/
     git clone git@github.com:YordanGeorgiev/wrapp.git
 
 ### 2.3. Build the first wrapp instance
@@ -61,16 +64,17 @@ Each wrapp instance has it's own version, environmnt type and owner. For now jus
 
     
     # build your product version dir - a kind of "this instance of the thingy dir"
-    mv -v /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
+    mv -v /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.2.8.dev.ysg
     
 
 ### 2.4. Create you local conf file
 The default conf file provides only limited functionality ( this is by design ) , thus copy and configure the configuration file for your host
 
     # go to the product version dir
-    cd /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
-    
-    mv -v sfw/bash/wrapp/wrapp.set-your-host.conf sfw/bash/wrapp/wrapp.`hostname -s`.conf
+    cd /opt/csitea/wrapp/wrapp.1.2.8.dev.ysg
+   
+   mv -v src/bash/wrapp/wrapp.set-your-host.cnf src/bash/wrapp/wrapp.`hostname -s`.conf
+   echo src/bash/wrapp/wrapp.host-name.conf >> met/.dev.wrapp
 
 ### 2.5. Start hacking
 Start hacking … or wait check at least the test call running all the functions of the tool … 
@@ -79,8 +83,8 @@ Start hacking … or wait check at least the test call running all the functions
     vim meta/.dev.wrapp
     
     # Ctrl + Z , 
-    bash sfw/bash/wrapp/test-wrapp.sh 
+    bash src/bash/wrapp/test-wrapp.sh 
     
     # now clone your own instance
-    bash sfw/bash/wrapp/wrapp.sh -a to-app=my-tool
+    bash src/bash/wrapp/wrapp.sh -a to-app=my-tool
 
