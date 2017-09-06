@@ -1,30 +1,34 @@
-# src/bash/wrapp/funcs/remove-action-files.func.sh
-
-# v1.1.2
+# v1.1.3
 # ---------------------------------------------------------
 # obs we assume that the caller is in the product_instance_dir
 # simply delete each file which greps finds to match to the action
-# name(s) cnfigured in the : 
-# src/bash/wrapp/tests/rem-wrapp-actions.lst
+# name(s) cnfigured in the :
+# src/bash/aws-botter/tests/rem-aws-botter-actions.lst
 # list file
 # ---------------------------------------------------------
 doRemoveActionFiles(){
 
-	doLog "DEBUG START doRemoveActionFiles"
-	
-	
-	# for each defined action 	
-	while read -r act ; do (
-		
-		doLog "INFO STOP  :: removing action: $act"
-		find . | grep $act | cut -c 3- | xargs rm -fv "{}"
-		
-	); 
-	done< <(cat "src/bash/wrapp/tests/rem-wrapp-actions.lst")
+   doLog "DEBUG START doRemoveActionFiles"
 
-	doLog "DEBUG STOP  doRemoveActionFiles"
+
+   # for each defined action
+   while read -r act ; do (
+
+      doLog "INFO STOP  :: removing action: $act"
+      find . | grep $act | cut -c 3- | xargs rm -fv "{}"
+      # remove the action files from the include files as well
+      for env in `echo dev tst prd`; do (
+         perl -pi -e 's/^(.*)'"$act"'(.*)$\\n//g' "$product_instance_dir/met/.$env.$run_unit"
+      );
+      done
+
+   );
+   done< <(cat "src/bash/aws-botter/tests/rem-aws-botter-actions.lst")
+
+   doLog "DEBUG STOP  doRemoveActionFiles"
 }
 # eof func doRemoveActionFiles
 
 
-# eof file: src/bash/wrapp/funcs/remove-action-files.func.sh
+# eof file: src/bash/aws-botter/funcs/remove-action-files.func.sh
+
