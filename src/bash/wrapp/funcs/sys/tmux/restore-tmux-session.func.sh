@@ -9,17 +9,20 @@
 # restores a tmux session
 # ---------------------------------------------------------
 doRestoreTmuxSession(){
-
-   source "$product_instance_dir/src/bash/wrapp/funcs/sys/tmux/tmux-common.sh"
+   set -x
+   source "$product_instance_dir/src/bash/$run_unit/funcs/sys/tmux/tmux-common.sh"
 
 	doCheckTmuxIsInstalled
 
-	tmux start-server
+   set +e
+
 	local count=0
 	local dimensions="$(terminal_size)"
 
 	while IFS=$'\t' read session_name window_name dir; do
 	 if [[ -d "$dir" && $window_name != "log" && $window_name != "man" ]]; then
+      echo session_name $session_name
+      echo window_name $window_name
 		if session_exists "$session_name"; then
 		  add_window "$session_name" "$window_name" "$dir"
 		else

@@ -1,5 +1,5 @@
-# file: cnf/wrapp.doc-pub-host.cnf
-# file: cnf/wrapp.doc-pub-host.cnf
+# file: cnf/wrapp.host-name.cnf
+# file: cnf/wrapp.host-name.cnf
 [MAIN_SETTINGS]
 
 
@@ -9,4 +9,4 @@ Emails=yordan.georgiev@gmail.com
 network_backup_dir=/vagrant/csitea/wrapp/dat/zip
 
 foo=bar
-# eof file: cnf/wrapp.doc-pub-host.cnf
+# eof file: cnf/wrapp.host-name.cnf

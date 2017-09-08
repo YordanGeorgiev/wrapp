@@ -37,5 +37,12 @@ new_tmux_session(){
 
 doCheckTmuxIsInstalled(){
 	which tmux >/dev/null 2>&1 ||
-		{ doLog "ERROR. tmux is not installed or not in PATH. Aborting." >&2; exit 1; }
+		{ doLog "FATAL ERROR - tmux is not installed 
+         or not in PATH. To install it do run 
+         sudo apt-get install -y exuberant-ctags
+         or
+         sudo yum install -y exuberant-ctags
+         or 
+         brew install ctags
+         Aborting." >&2; exit 1; }
 }

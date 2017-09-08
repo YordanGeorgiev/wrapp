@@ -1,7 +1,10 @@
-# file: cnf/wrapp.doc-pub-host.cnf
+# file: cnf/wrapp.host-name.cnf
 
 # multiple projects support
 issue_tracker_project = wrapp
+
+# where to get the DDL's for the db from
+sql_dir=/opt/csitea/wrapp/wrapp.0.1.8.prd.ysg/src/sql/pgsql/prd_issue_tracker
 
 # The logging directory 
 LogDir = %ProductInstanceDir%/dat/log
@@ -25,7 +28,7 @@ DbType 	=         mariadb
 LogFile=%LogDir%/%ProductName%.%YYYY%-%MM%-%DD%.log
 
 # the host on which the mariadb is running 
-db_host = doc-pub-host
+db_host = host-name
 
 # the pgsql port
 db_port = 13306
@@ -54,4 +57,4 @@ PrintDebugMsgs =                 1
 # Whether or not to pring TRACE messages
 PrintTraceMsgs =                 1 
 
-# eof file: cnf/wrapp.doc-pub-host.cnf
+# eof file: cnf/wrapp.host-name.cnf
