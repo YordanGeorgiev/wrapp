@@ -1,4 +1,4 @@
-# v1.1.3
+# v1.3.0
 # ---------------------------------------------------------
 # obs we assume that the caller is in the product_instance_dir
 # simply delete each file which greps finds to match to the action
@@ -23,7 +23,7 @@ doRemoveActionFiles(){
       done
 
    );
-   done< <(cat 'src/bash/aws-botter/tests/rem-'"$run_unit"'-actions.lst')
+   done< <(cat 'src/bash/'"$run_unit"'/tests/rem-'"$run_unit"'-actions.lst')
 
    doLog "DEBUG STOP  doRemoveActionFiles"
 }

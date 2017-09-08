@@ -13,7 +13,7 @@ trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
 trap "exit $exit_code" TERM
 export TOP_PID=$$
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ main(){
 #eof main
 
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # the "reflection" func
 #------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ get_function_list () {
 
 
 #
-# v1.2.7
+# v1.3.0
 #------------------------------------------------------------------------------
 # run all the actions
 #------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ doRunTests(){
 #eof fun doRunTests
 
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ doInit(){
 #eof doInit
 
 
-# v1.2.7
+# v1.3.0
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ doExit(){
 }
 #eof func doExit
 
-# v1.2.7
+# v1.3.0
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -182,7 +182,7 @@ doLog(){
 #eof func doLog
 
 
-#v1.2.7
+#v1.3.0
 #------------------------------------------------------------------------------
 # cleans the unneeded during after run-time stuff
 # do put here the after cleaning code
@@ -200,7 +200,7 @@ doCleanAfterRun(){
 #eof func doCleanAfterRun
 
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -221,7 +221,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -244,7 +244,7 @@ doRunCmdOrExit(){
 #eof func doRunCmdOrExit
 
 
-# v1.2.7 
+# v1.3.0 
 #------------------------------------------------------------------------------
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ doSetVars(){
    export product_instance_dir=`pwd`;
    
    # add the doLogTestRunEntry func
-   . "$product_instance_dir/src/bash/wrapp/funcs/log-test-run-entry.func.sh"
+   source "$product_instance_dir"'/lib/bash/funcs/log-test-run-entry.func.sh'
 
 	# include all the func files to fetch their funcs 
 	while read -r test_file ; do . "$test_file" ; done < <(find . -name "*test.sh")
@@ -311,7 +311,7 @@ doSetVars(){
 #eof func doSetVars
 
 
-# v1.2.7
+# v1.3.0
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection

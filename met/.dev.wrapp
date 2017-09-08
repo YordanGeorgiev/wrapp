@@ -241,14 +241,7 @@ dat/readme.txt
 cnf/readme.txt
 src/readme.txt
 #---
-doc/txt/wrapp/specs/log-test-run-entry.spec.txt
-doc/txt/wrapp/funcs/log-test-run-entry.func.txt
-doc/txt/wrapp/tests/log-test-run-entry.test.txt
-doc/txt/wrapp/helps/log-test-run-entry.help.txt
-src/bash/wrapp/specs/log-test-run-entry.spec.sh
-src/bash/wrapp/funcs/log-test-run-entry.func.sh
-src/bash/wrapp/tests/log-test-run-entry.test.sh
-src/bash/wrapp/helps/log-test-run-entry.help.sh
+lib/bash/funcs/log-test-run-entry.func.sh
 dat/tests/1
 #---
 doc/txt/wrapp/helps/action-to-remove.help.txt
