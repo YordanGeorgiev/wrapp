@@ -23,7 +23,7 @@ doRemoveActionFiles(){
       done
 
    );
-   done< <(cat "src/bash/aws-botter/tests/rem-aws-botter-actions.lst")
+   done< <(cat 'src/bash/aws-botter/tests/rem-'"$run_unit"'-actions.lst')
 
    doLog "DEBUG STOP  doRemoveActionFiles"
 }

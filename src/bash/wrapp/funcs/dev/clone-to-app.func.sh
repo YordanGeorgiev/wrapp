@@ -17,7 +17,6 @@ doCloneToApp(){
 	set -x
    mkdir -p $tgt_product_dir
 	mkdir -p $tgt_product_instance_dir 
-   sleep 10 
 
 	# remove everything from the tgt product version dir - no extra files allowed !!!
 	rm -fvr $tgt_product_instance_dir
