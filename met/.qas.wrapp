@@ -1,4 +1,8 @@
 # perl_ignore_file_pattern=.*\.swp$|.*\.log|$.*\.swo|\#---$
+met/.qas.wrapp
+src/bash/wrapp/install-prereq-libs-and-bins-on-ubuntu.sh
+src/bash/wrapp/specs/log-test-run-entry.spec.sh
+src/bash/wrapp/tests/log-test-run-entry.test.sh
 src/bash/wrapp/tests/run-wrapp-tests.lst
 src/bash/wrapp/bootstrap-wrapp.sh
 src/bash/wrapp/wrapp.sh
@@ -283,3 +287,9 @@ cnf/hosts/host-name/home/ysg/.tmux.conf
 doc/xls
 doc/xls/wrapp-devops-guide.xls
 doc/xls/wrapp-user-stories.xls
+# --
+doc/txt/wrapp/funcs/log-test-run-entry.func.txt
+doc/txt/wrapp/helps/log-test-run-entry.help.txt
+doc/txt/wrapp/specs/log-test-run-entry.spec.txt
+doc/txt/wrapp/tests/log-test-run-entry.test.txt
+lib/bash/funcs/log-test-run-entry.func.sh

@@ -3,3 +3,4 @@
 **/*.log
 dat/tmp/**
 dat/wrapp/**
+src/bash/wrapp/tmp/.tmp**
