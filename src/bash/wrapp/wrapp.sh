@@ -11,8 +11,6 @@ umask 022    ;
 # set -v
 # exit the script if any statement returns a non-true return value. gotcha !!!
 # set -e
-trap "exit 1" TERM
-export TOP_PID=$$
 
 #v1.2.5 
 #------------------------------------------------------------------------------
@@ -122,7 +120,7 @@ doInit(){
    my_name_ext=`basename $0`
    run_unit=${my_name_ext%.*}
    host_name=$(hostname -s)
-: "${sleep_interval:=0}"
+   sleep_interval="${sleep_interval:=0}"
 }
 #eof doInit
 
@@ -203,16 +201,26 @@ doCheckReadyToStart(){
 
 
 
+export TOP_PID=$$
+# src: https://unix.stackexchange.com/a/79654/37428
+for sig in INT TERM HUP; do
+   trap "exit $((128 + $(kill -l "$sig")))" "$sig"
+done
 
-# v1.2.7
+
+#
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
-# call by: 
-# export exit_code=0 ; doExit "ok msg"
-# export exit_code=1 ; doExit "NOK msg"
+# you must export the exit_code var before the call:
+# exit_code=$?; 
+# test $exit_code -eq 0 && doExit $exit_code "$ok_msg" && exit 0
+# test $exit_code -ne 0 && doExit $exit_code "$err_msg" && exit $exit_code
 #------------------------------------------------------------------------------
 doExit(){
    exit_msg="$*"
+
+   doCleanAfterRun
+   cd $call_start_dir
 
    if (( $exit_code != 0 )); then
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
@@ -225,16 +233,11 @@ doExit(){
       doLog "INFO  STOP FOR $run_unit RUN: $exit_code $exit_msg"
    fi
 
-   doCleanAfterRun
-	cd $call_start_dir 
-
-   #src: http://stackoverflow.com/a/9894126/65706
-   test $exit_code -ne 0 && kill -s TERM "$TOP_PID" && exit $exit_code
    test $exit_code -eq 0 && exit 0
-   #test $exit_code -ne 0 && kill -9 "$TOP_PID"
+   test $exit_code -ne 0 && kill -s TERM "$TOP_PID" && exit $exit_code
+   test $exit_code -ne 0 && kill -s HUP "$TOP_PID" && exit $exit_code
 }
 #eof func doExit
-
 
 #v1.2.5 
 #------------------------------------------------------------------------------
@@ -334,10 +337,10 @@ doRunCmdOrExit(){
 
    doLog "DEBUG running cmd or exit: \"$cmd\""
    msg=$($cmd 2>&1)
-   ret_cmd=$?
+   export exit_code=$?
    # if occured during the execution exit with error
    error_msg=": FATAL : Failed to run the command \"$cmd\" with the output \"$msg\" !!!"
-   [ $ret_cmd -eq 0 ] || doExit "$ret_cmd" "$error_msg"
+   test exit_code -ne 0 || doExit "$exit_code" "$error_msg" && exit $exit_code
 
    #if no occured just log the message
    doLog "DEBUG : cmdoutput : \"$msg\""
@@ -380,7 +383,7 @@ doSetVars(){
    # start set default vars
    do_print_debug_msgs=0
    # stop set default vars
-   
+   ini_section='MAIN_SETTINGS' 
 	doParseConfFile
 	( set -o posix ; set ) | sort >"$tmp_dir/vars.after"
 
@@ -442,7 +445,7 @@ doSetUndefinedShellVarsFromCnfFile(){
 }
 #eof func doSetShellVarsFromCnfFile
 
-# v1.2.9
+# v1.2.8
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection
@@ -475,7 +478,7 @@ doParseConfFile(){
 
    # debug echo "@doParseConfFile cnf_file:: $cnf_file"
    # coud be later on parametrized ...
-   test -z "$ini_section" && ini_section='MAIN_SETTINGS'
+   test -z "$ini_section" && ini_section=MainSection
 
    doLog "DEBUG reading: the following configuration file"
    doLog "DEBUG ""$cnf_file"

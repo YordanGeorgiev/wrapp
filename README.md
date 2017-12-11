@@ -8,7 +8,7 @@ Table of Contents
     * [2.1. Prerequisites](#21-prerequisites)
     * [2.2. Fetch the source](#22-fetch-the-source)
     * [2.3. Build the first wrapp instance](#23-build-the-first-wrapp-instance)
-    * [2.4. Create you local conf file](#24-create-you-local-conf-file)
+    * [2.4. Check the runnable actions](#24-check-the-runnable-actions)
     * [2.5. Start hacking](#25-start-hacking)
 
 
@@ -54,23 +54,24 @@ Fetch the source from git hub as follows:
     
     # fetch the source
     git clone git@github.com:YordanGeorgiev/wrapp.git
+    
+    # DO NOT CD into the new dir !!!!
 
 ### 2.3. Build the first wrapp instance
-When doing for first time do exactly as shown bellow, otherwise no joy ... 
-Each wrapp instance has it's own version, environmnt type and owner. For now just follow the instruction - after half an hour you will be hacking this … 
+Build the wrapp instance by running the bootstrap script
 
+    # bootstrap the product instance dir
+    bash wrapp/src/bash/wrapp/bootstrap-wrapp.sh
     
-    # build your product version dir - a kind of "this instance of the thingy dir"
-    mv -v /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
+    # the script should prompt you to
+    cd /opt/csitea/wrapp/wrapp.1.1.5.dev.$USER
     
 
-### 2.4. Create you local conf file
-The default conf file provides only limited functionality ( this is by design ) , thus copy and configure the configuration file for your host
+### 2.4. Check the runnable actions
+You could check the functions which could be run - aka "actions" by issuing the following command. 
 
-    # go to the product version dir
-    cd /opt/csitea/wrapp/wrapp /opt/csitea/wrapp/wrapp.1.1.5.dev.ysg
-    
-    mv -v sfw/bash/wrapp/wrapp.set-your-host.conf sfw/bash/wrapp/wrapp.`hostname -s`.conf
+    # check the runnable with the -a cmd arg actions 
+    find . -name '*.func.sh' | sort
 
 ### 2.5. Start hacking
 Start hacking … or wait check at least the test call running all the functions of the tool … 

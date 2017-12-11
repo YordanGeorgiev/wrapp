@@ -21,3 +21,4 @@ print-help
 print-usage
 action-to-remove
 log-test-run-entry
+do-something

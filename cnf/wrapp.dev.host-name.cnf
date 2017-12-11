@@ -1,0 +1,12 @@
+# file: cnf/wrapp.host-name.cnf
+[MAIN_SETTINGS]
+
+
+Emails=yordan.georgiev@gmail.com
+
+# where to place the backups of the 
+network_backup_dir=/vagrant/csitea/wrapp/dat/zip
+
+foo=bar
+
+# eof file: cnf/wrapp.host-name.cnf

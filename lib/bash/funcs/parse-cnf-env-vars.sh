@@ -2,7 +2,7 @@
 # ---------------------------------------------------------
 # source this lib function by:
 # source ./lib/bash/funcs/parse-cnf-env-vars.sh
-# call by: doParseCnfEnvVars cnf/wrapp.dev.doc-pub-host.cnf
+# call by: doParseCnfEnvVars cnf/wrapp.dev.host-name.cnf
 # verify by: 
 # echo $issue_tracker_project 
 # should echo:

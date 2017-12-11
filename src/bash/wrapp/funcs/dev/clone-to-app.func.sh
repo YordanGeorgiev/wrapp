@@ -6,7 +6,6 @@
 # bash src/bash/wrapp/wrapp.sh -a to-app=<<new_app>>
 #------------------------------------------------------------------------------
 doCloneToApp(){
-	set -x
 	tgt_app="$1"
 	prefix='to-app='
 	tgt_app=${tgt_app#$prefix}
@@ -15,6 +14,8 @@ doCloneToApp(){
 	tgt_product_instance_env_name=$(echo $tgt_product_instance_env_name | perl -ne "s/$env_type/dev/g;print")
 	tgt_product_dir=$product_base_dir/$tgt_app
 	tgt_product_instance_dir=$tgt_product_dir/$tgt_product_instance_env_name
+	set -x
+   mkdir -p $tgt_product_dir
 	mkdir -p $tgt_product_instance_dir 
 
 	# remove everything from the tgt product version dir - no extra files allowed !!!
