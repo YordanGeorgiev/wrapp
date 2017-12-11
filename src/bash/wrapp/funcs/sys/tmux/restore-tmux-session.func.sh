@@ -9,7 +9,6 @@
 # restores a tmux session
 # ---------------------------------------------------------
 doRestoreTmuxSession(){
-   set -x
    source "$product_instance_dir/src/bash/$run_unit/funcs/sys/tmux/tmux-common.sh"
 
 	doCheckTmuxIsInstalled
@@ -21,8 +20,7 @@ doRestoreTmuxSession(){
 
 	while IFS=$'\t' read session_name window_name dir; do
 	 if [[ -d "$dir" && $window_name != "log" && $window_name != "man" ]]; then
-      echo session_name $session_name
-      echo window_name $window_name
+      # echo $session_name -- $window_name
 		if session_exists "$session_name"; then
 		  add_window "$session_name" "$window_name" "$dir"
 		else
