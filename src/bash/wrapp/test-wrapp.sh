@@ -13,7 +13,7 @@ trap 'doExit $LINENO $BASH_COMMAND; exit' SIGHUP SIGINT SIGQUIT
 trap "exit $exit_code" TERM
 export TOP_PID=$$
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # the main function called
 #------------------------------------------------------------------------------
@@ -21,17 +21,17 @@ main(){
    doInit
   	doSetVars
 	doRunTests "$@"
-  	doExit 0 "# = STOP  MAIN = $run_unit_tester "
+  	doExit 0 "# = STOP  MAIN = $RUN_UNIT_TESTER "
 
 }
 #eof main
 
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # the "reflection" func
 #------------------------------------------------------------------------------
-get_function_list () {
+get_function_list() {
     env -i bash --noprofile --norc -c '
     source "'"$1"'"
     typeset -f |
@@ -47,14 +47,19 @@ get_function_list () {
 
 
 #
-# v1.3.0
+# v1.2.8
 #------------------------------------------------------------------------------
 # run all the actions
 #------------------------------------------------------------------------------
 doRunTests(){
-	cd $product_instance_dir
+	cd $PRODUCT_INSTANCE_DIR
 
    doLogTestRunEntry 'INIT'
+   doLog "INFO actions list file:
+   $PRODUCT_INSTANCE_DIR/src/bash/wrapp/tests/run-wrapp-tests.lst"
+   doLog "INFO running the following actions : "
+   cat $PRODUCT_INSTANCE_DIR/src/bash/wrapp/tests/run-wrapp-tests.lst | grep -v '#'
+   sleep 1
 
 	while read -r action ; do (
 
@@ -94,37 +99,36 @@ doRunTests(){
 		done < <(find src/bash/wrapp/tests -type f -name '*.sh')
 
 	);
-	done < <(cat $product_instance_dir/src/bash/wrapp/tests/run-wrapp-tests.lst)
+	done < <(cat $PRODUCT_INSTANCE_DIR/src/bash/wrapp/tests/run-wrapp-tests.lst)
 
    doLogTestRunEntry 'STATUS'
 }
 #eof fun doRunTests
 
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # register the run-time vars before the call of the $0
 #------------------------------------------------------------------------------
 doInit(){
    call_start_dir=`pwd`
-   run_unit_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
-   tmp_dir="$run_unit_bash_dir/tmp/.tmp.$$"
+   wrap_bash_dir=$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")
+   tmp_dir="$wrap_bash_dir/tmp/.tmp.$$"
    mkdir -p "$tmp_dir"
    ( set -o posix ; set ) | sort >"$tmp_dir/vars.before"
    my_name_ext=`basename $0`
-   run_unit_tester=${my_name_ext%.*}
+   RUN_UNIT_TESTER=${my_name_ext%.*}
    host_name=$(hostname -s)
-   ${sleep_interval:=0}    # to enable slower execution export sleep_interval=3
+   export sleep_interval=${sleep_interval:=0}   # to slow down during debuging export sleep_iterval=3
 }
 #eof doInit
 
 
-# v1.3.0
+# v1.0.8
 #------------------------------------------------------------------------------
 # clean and exit with passed status and message
 #------------------------------------------------------------------------------
 doExit(){
-   #set -x
    exit_code=0
    exit_msg="$*"
 
@@ -140,11 +144,11 @@ doExit(){
       exit_msg=" ERROR --- exit_code $exit_code --- exit_msg : $exit_msg"
       >&2 echo "$exit_msg"
       # doSendReport
-      doLog "FATAL STOP FOR $run_unit_tester RUN with: "
+      doLog "FATAL STOP FOR $RUN_UNIT_TESTER RUN with: "
       doLog "FATAL exit_code: $exit_code exit_msg: $exit_msg"
    else
-      doLog "INFO  STOP FOR $run_unit_tester RUN with: "
-      doLog "INFO  STOP FOR $run_unit_tester RUN: $exit_code $exit_msg"
+      doLog "INFO  STOP FOR $RUN_UNIT_TESTER RUN with: "
+      doLog "INFO  STOP FOR $RUN_UNIT_TESTER RUN: $exit_code $exit_msg"
    fi
 
    doCleanAfterRun
@@ -156,7 +160,7 @@ doExit(){
 }
 #eof func doExit
 
-# v1.3.0
+# v1.2.8 
 #------------------------------------------------------------------------------
 # echo pass params and print them to a log file and terminal
 # with timestamp and $host_name and $0 PID
@@ -175,14 +179,14 @@ doLog(){
 
    # define default log file none specified in cnf file
    test -z $log_file && \
-		mkdir -p $product_instance_dir/dat/log/bash && \
-			log_file="$product_instance_dir/dat/log/bash/$run_unit_tester.`date "+%Y%m"`.log"
-   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$run_unit_tester][@$host_name] [$$] $msg " >> $log_file
+		mkdir -p $PRODUCT_INSTANCE_DIR/dat/log/bash && \
+			log_file="$PRODUCT_INSTANCE_DIR/dat/log/bash/$RUN_UNIT_TESTER.`date "+%Y%m"`.log"
+   echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S"` [$RUN_UNIT_TESTER][@$host_name] [$$] $msg " >> $log_file
 }
 #eof func doLog
 
 
-#v1.3.0
+#v1.2.8
 #------------------------------------------------------------------------------
 # cleans the unneeded during after run-time stuff
 # do put here the after cleaning code
@@ -195,12 +199,12 @@ doCleanAfterRun(){
 
 #   while read -r f ; do 
 #      test -f $f && rm -fv "$f" ; 
-#   done < <(find "$run_unit_bash_dir" -type f -name '*.bak')
+#   done < <(find "$wrap_bash_dir" -type f -name '*.bak')
 }
 #eof func doCleanAfterRun
 
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # run a command and log the call and its output to the log_file
 # doPrintHelp: doRunCmdAndLog "$cmd"
@@ -221,7 +225,7 @@ doRunCmdAndLog(){
 #eof func doRunCmdAndLog
 
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # run a command on failure exit with message
 # doPrintHelp: doRunCmdOrExit "$cmd"
@@ -244,17 +248,17 @@ doRunCmdOrExit(){
 #eof func doRunCmdOrExit
 
 
-# v1.3.0 
+# v1.2.8 
 #------------------------------------------------------------------------------
 # set the variables from the $0.$host_name.cnf file which has ini like syntax
 #------------------------------------------------------------------------------
 doSetVars(){
-   cd $run_unit_bash_dir
+   cd $wrap_bash_dir
    for i in {1..3} ; do cd .. ; done ;
-   export product_instance_dir=`pwd`;
+   export PRODUCT_INSTANCE_DIR=`pwd`;
    
    # add the doLogTestRunEntry func
-   source "$product_instance_dir"'/lib/bash/funcs/log-test-run-entry.func.sh'
+   . "$PRODUCT_INSTANCE_DIR/src/bash/wrapp/funcs/log-test-run-entry.func.sh"
 
 	# include all the func files to fetch their funcs 
 	while read -r test_file ; do . "$test_file" ; done < <(find . -name "*test.sh")
@@ -267,9 +271,9 @@ doSetVars(){
 	#while read -r test_file ; do echo "$test_file" ; done < <(find . -name "*test.sh")
    
 	# this will be dev , tst, prd
-   env_type=$(echo `basename "$product_instance_dir"`|cut -d'.' -f5)
-	product_version=$(echo `basename "$product_instance_dir"`|cut -d'.' -f2-4)
-	product_instance_env_name=$(basename "$product_instance_dir")
+   env_type=$(echo `basename "$PRODUCT_INSTANCE_DIR"`|cut -d'.' -f5)
+	product_version=$(echo `basename "$PRODUCT_INSTANCE_DIR"`|cut -d'.' -f2-4)
+	environment_name=$(basename "$PRODUCT_INSTANCE_DIR")
 
 	cd ..
 	product_dir=`pwd`;
@@ -283,7 +287,7 @@ doSetVars(){
 	cd ..
 	org_base_dir=`pwd`;
 
-	cd "$run_unit_bash_dir/"
+	cd "$wrap_bash_dir/"
 
    # start settiing default vars
    do_print_debug_msgs=0
@@ -296,7 +300,7 @@ doSetVars(){
 
 	doLog "INFO # --------------------------------------"
 	doLog "INFO # -----------------------"
-	doLog "INFO # ===		 START MAIN   === $run_unit_tester"
+	doLog "INFO # ===		 START MAIN   === $RUN_UNIT_TESTER"
 	doLog "INFO # -----------------------"
 	doLog "INFO # --------------------------------------"
 		
@@ -311,7 +315,7 @@ doSetVars(){
 #eof func doSetVars
 
 
-# v1.3.0
+# v1.2.8
 #------------------------------------------------------------------------------
 # parse the ini like $0.$host_name.cnf and set the variables
 # cleans the unneeded during after run-time stuff. Note the MainSection
@@ -319,15 +323,15 @@ doSetVars(){
 #------------------------------------------------------------------------------
 doParseConfFile(){
 	# set a default cnfiguration file
-	cnf_file="$run_unit_bash_dir/$run_unit_tester.cnf"
+	cnf_file="$wrap_bash_dir/$RUN_UNIT_TESTER.cnf"
 
 	# however if there is a host dependant cnf file override it
-	test -f "$run_unit_bash_dir/$run_unit_tester.$host_name.cnf" \
-		&& cnf_file="$run_unit_bash_dir/$run_unit_tester.$host_name.cnf"
+	test -f "$wrap_bash_dir/$RUN_UNIT_TESTER.$host_name.cnf" \
+		&& cnf_file="$wrap_bash_dir/$RUN_UNIT_TESTER.$host_name.cnf"
 	
 	# if we have perl apps they will share the same cnfiguration settings with this one
-	test -f "$product_instance_dir/$run_unit_tester.$host_name.cnf" \
-		&& cnf_file="$product_instance_dir/$run_unit_tester.$host_name.cnf"
+	test -f "$PRODUCT_INSTANCE_DIR/$RUN_UNIT_TESTER.$host_name.cnf" \
+		&& cnf_file="$PRODUCT_INSTANCE_DIR/$RUN_UNIT_TESTER.$host_name.cnf"
 
 	# yet finally override if passed as argument to this function
 	# if the the ini file is not passed define the default host independant ini file
@@ -357,7 +361,7 @@ main "$@"
 #
 #----------------------------------------------------------
 # Purpose:
-# a simplistic tester for the simplistic bash stub wrapper
+# a simplistic tester for the wrapp
 #----------------------------------------------------------
 #
 #----------------------------------------------------------

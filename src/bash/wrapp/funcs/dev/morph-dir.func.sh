@@ -1,4 +1,4 @@
-# v1.0.7
+# v0.4.9
 #------------------------------------------------------------------------------
 # Purpose: 
 # to search for a string and replace it with another recursively in a dir
@@ -12,7 +12,8 @@
 # <(find src/bash/wrapp/funcs/ -type f)
 #------------------------------------------------------------------------------
 doMorphDir(){
-		
+
+      # set -x 
 		# some initial checks the users should set the vars in their shells !!!
 		test -z $dir_to_morph && doExit 1 "You must export dir_to_morph=<<the-dir>> - it is empty !!!"	
 		test -d $dir_to_morph || doExit 1 "The dir to morph : \"$dir_to_morph\" is not a dir !!!"
@@ -38,9 +39,9 @@ doMorphDir(){
             continue
             ;;
          esac
-			perl -pi -e "s#$to_srch#$to_repl#g" "$file"
+			perl -pi -e "s#\Q$to_srch\E#$to_repl#g" "$file"
 		);
-		done < <(find $dir_to_morph -type f -exec file {} \; | grep text | cut -d: -f1)
+		done < <(find $dir_to_morph -type f -not -exec file {} \; | grep text | cut -d: -f1)
 		
 		doLog "INFO STOP  :: search and replace in non-binary files"
 
@@ -48,15 +49,20 @@ doMorphDir(){
 		doLog "INFO search and replace in dir and file paths dir_to_morph:$dir_to_morph"
       # rename the dirs according to the pattern
       while read -r dir ; do (
-         perl -nle '$o=$_;s#'"$to_srch"'#'"$to_repl"'#g;$n=$_;`mkdir -p $n` ;'
+         echo $dir|perl -nle '$o=$_;s#'"\Q$to_srch\E"'#'"$to_repl"'#g;$n=$_;`mkdir -p $n` ;'
       );
-      done < <(find $dir_to_morph -type d|grep -v '.git')
+      done < <(find $dir_to_morph -type d -not -path "/*node_modules/*" |grep -v '.git')
 
       # rename the files according to the pattern
       while read -r file ; do (
-         perl -nle '$o=$_;s#'"$to_srch"'#'"$to_repl"'#g;$n=$_;rename($o,$n) unless -e $n ;'
+         echo $file | perl -nle '$o=$_;s|'"\Q$to_srch\E"'|'"$to_repl"'|g;$n=$_;rename($o,$n) unless -e $n ;'
       );
-      done < <(find $dir_to_morph -type f|grep -v '.git')
+      done < <(find $dir_to_morph -type f -not -path "*/node_modules/*" |grep -v '.git')
+      
+      while read -r dir ; do (
+         rm -rv $dir
+      );
+      done < <(find $dir_to_morph -type d -not -path "/*node_modules/*" |grep -v '.git'|grep "$to_srch")
 
 }
 #eof doMorphDir

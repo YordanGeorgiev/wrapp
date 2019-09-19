@@ -6,20 +6,17 @@
 #------------------------------------------------------------------------------
 doCreateFullPackage(){
 
-	doLog "INFO START create-full-package.func.sh" ;
-
+   test -z ${wrapp_project:-} && wrapp_project=wrapp
 	#define default vars
-	test -z $include_file         && \
-		include_file="$product_instance_dir/met/.$env_type.$run_unit"
+	test -z ${include_file:-}         && \
+		include_file="$PRODUCT_INSTANCE_DIR/met/.$env_type.$RUN_UNIT"
 
 	# relative file path is passed turn it to absolute one 
-	[[ $include_file == /* ]] || include_file=$product_instance_dir/$include_file
+	[[ $include_file == /* ]] || include_file=$PRODUCT_INSTANCE_DIR/$include_file
 
    if [ ! -f "$include_file" ]; then
-      msg="the deployment file: "'"'"$include_file"'" does not exist !!!'
-      export exit_code=1 ;  
-      doExit "$msg"
-      exit 1
+      doLog "FATAL the deployment file: $include_file does not exist !!!"
+      return 1
    fi
 
    tgt_env_type=$(echo `basename "$include_file"`|cut -d'.' -f2)
@@ -27,7 +24,7 @@ doCreateFullPackage(){
 	# start: add the perl_ignore_file_pattern
 	while read -r line ; do \
 		got=$(echo $line|perl -ne 'm|^\s*#\s*perl_ignore_file_pattern\s*=(.*)$|g;print $1'); \
-		test -z "$got" || perl_ignore_file_pattern="$got|$perl_ignore_file_pattern" ;
+		test -z "$got" || perl_ignore_file_pattern="$got|${perl_ignore_file_pattern:-}" ;
 	done < <(cat $include_file)
 
 	# or how-to remove the last char from a string 	
@@ -35,39 +32,53 @@ doCreateFullPackage(){
 	test -z $perl_ignore_file_pattern && perl_ignore_file_pattern='.*\.swp$|.*\.log|$.*\.swo$'
 	echo perl_ignore_file_pattern::: $perl_ignore_file_pattern
 	# note: | egrep -v "$perl_ignore_file_pattern" | egrep -v '^\s*#'
-	cd $org_base_dir
+	cd $product_base_dir
 
 	timestamp=`date "+%Y%m%d_%H%M%S"`
 	# the last token of the include_file with . token separator - thus no points in names
 	zip_file_name=$(echo $include_file | rev | cut -d'.' -f 1 | rev)
+   test $zip_file_name != $RUN_UNIT && zip_file_name="$zip_file_name"'--'"$wrapp_project"
 	zip_file_name="$zip_file_name.$product_version.$tgt_env_type.$timestamp.$host_name.zip"
 	zip_file="$product_dir/$zip_file_name"
-	mkdir -p $product_instance_dir/dat/$run_unit/tmp
-	echo $zip_file>$product_instance_dir/dat/$run_unit/tmp/zip_file
+	mkdir -p $PRODUCT_INSTANCE_DIR/dat/$RUN_UNIT/tmp
+	echo $zip_file>$PRODUCT_INSTANCE_DIR/dat/$RUN_UNIT/tmp/zip_file
 
+   cd $product_base_dir; cd .. ;
 	# zip MM ops
 	# -MM  --must-match
 	# All  input  patterns must match at least one file and all input files found must be readable.
 	set -x ; ret=1
 	cat $include_file | egrep -v "$perl_ignore_file_pattern" | sed '/^#/ d' | perl -ne 's|\n|\000|g;print'| \
-	xargs -0 -I "{}" zip -MM $zip_file "$org_name/$run_unit/$product_instance_env_name/{}"
+	xargs -0 -I "{}" zip -MM $zip_file "${org_name}/$RUN_UNIT/$environment_name/{}"
 	ret=$? 
 	set +x
 	test $ret -gt 0 && (
 		while IFS='' read f ; do (
-			test -d "$product_instance_dir/$f" && continue ; 
-			test -f "$product_instance_dir/$f" && continue ; 
-			test -f "$product_instance_dir/$f" || doLog 'ERROR not a file: "'"$f"'"' ;  
-			test -f "$product_instance_dir/$f" || ret=1 && exit 1
+			test -d "$PRODUCT_INSTANCE_DIR/$f" && continue ; 
+			test -f "$PRODUCT_INSTANCE_DIR/$f" && continue ; 
+			test -f "$PRODUCT_INSTANCE_DIR/$f" || doLog 'ERROR not a file: "'"$f"'"' ;  
+			test -f "$PRODUCT_INSTANCE_DIR/$f" || ret=1 && exit 1
 		); 
 		done < <(cat $include_file | egrep -v "$perl_ignore_file_pattern" | sed '/^#/ d')
 	);
 
    if [ ! $ret -eq 0 ]; then
-      msg="deleted $zip_file , because of packaging errors $! !!!"
+      doLog "FATAL deleted $zip_file , because of packaging errors $! !!!"
 	   rm -fv $zip_file
-      export exit_code=1 ;  doExit "$msg" ; 
-      exit 1
+      return 1
+   fi
+ 
+   test -z ${mix_data_dir:-} && mix_data_dir=$PRODUCT_INSTANCE_DIR/dat/mix
+   # backup the project data dir if not running on the product itself ...
+   test -d $mix_data_dir/$(date "+%Y")/$(date "+%Y-%m")/$(date "+%Y-%m-%d") || doIncreaseDate
+   # and zip the project data dir
+   if [ ! $RUN_UNIT == $wrapp_project ]; then
+      cd $mix_data_dir
+      for i in {1..3} ; do cd .. ; done ;
+      zip -r $zip_file $wrapp_project/dat/mix/$(date "+%Y")/$(date "+%Y-%m")/$(date "+%Y-%m-%d")
+	   cd $org_base_dir
+   else 
+      zip -r $zip_file $org_name/$RUN_UNIT/$environment_name/dat/mix/$(date "+%Y")/$(date "+%Y-%m")/$(date "+%Y-%m-%d")
    fi
 
    msg="created the following full development package:"

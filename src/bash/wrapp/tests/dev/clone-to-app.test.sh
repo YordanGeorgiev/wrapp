@@ -9,7 +9,7 @@ doTestCloneToApp(){
 	doLog "DEBUG START doTestCloneToApp"
 	
 	# add your action implementation code here ... 
-   bash src/bash/wrapp/wrapp.sh -a to-app=foobar
+   bash src/bash/wrapp/wrapp.sh -a to-app=wrapp
 
 	doLog "DEBUG STOP  doTestCloneToApp"
 }

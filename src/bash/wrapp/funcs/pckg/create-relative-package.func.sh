@@ -1,22 +1,16 @@
-#!/bin/bash
-
-
-#v0.2.3
 #------------------------------------------------------------------------------
-# creates a package from the relative file paths specified in the .dev file
+# creates a package from the relative file paths specified in the .env file
 #------------------------------------------------------------------------------
 doCreateRelativePackage(){
 
-	cd $product_instance_dir
 	mkdir -p $product_dir/dat/zip
-		test $? -ne 0 && doExit 2 "Failed to create $product_instance_dir/dat/zip !"
+		test $? -ne 0 && doExit 2 "Failed to create $PRODUCT_INSTANCE_DIR/dat/zip !"
 
-	#define default vars
-	test -z $include_file         && \
-		include_file="$product_instance_dir/met/.$env_type.$run_unit"
+	test -z ${include_file:-}         && \
+		include_file="$PRODUCT_INSTANCE_DIR/met/.$env_type.$RUN_UNIT"
 
 	# relative file path is passed turn it to absolute one 
-	[[ $include_file == /* ]] || include_file=$product_instance_dir/$include_file
+	[[ $include_file == /* ]] || include_file=$PRODUCT_INSTANCE_DIR/$include_file
 
 	test -f $include_file || \
 		doExit 3 "did not found any deployment file paths containing deploy file @ $include_file"
@@ -33,14 +27,14 @@ doCreateRelativePackage(){
 	ret=0
 	while read f ; do
 		[[ $f == '#'* ]] && continue ; 
-		test -d "$product_instance_dir/$f" && continue ; 
-		test -f "$product_instance_dir/$f" && continue ; 
-		test -f "$product_instance_dir/$f" || doLog 'FATAL cannot find the file: "'"$product_instance_dir/$f"'" to package it' ;  
-		test -f "$product_instance_dir/$f" || doLog 'ERROR search for it in the '"$include_file"' ' ;  
-		test -f "$product_instance_dir/$f" || doLog 'INFO if you need the file add it to the list file  ' ;  
-		test -f "$product_instance_dir/$f" || doLog 'INFO if you do not need the file remove it from the list file  ' ;  
-		test -f "$product_instance_dir/$f" || ret=1
-		test -f "$product_instance_dir/$f" && break ;
+		test -d "$PRODUCT_INSTANCE_DIR/$f" && continue ; 
+		test -f "$PRODUCT_INSTANCE_DIR/$f" && continue ; 
+		test -f "$PRODUCT_INSTANCE_DIR/$f" || doLog 'FATAL cannot find the file: "'"$PRODUCT_INSTANCE_DIR/$f"'" to package it' ;  
+		test -f "$PRODUCT_INSTANCE_DIR/$f" || doLog 'ERROR search for it in the '"$include_file"' ' ;  
+		test -f "$PRODUCT_INSTANCE_DIR/$f" || doLog 'INFO if you need the file add it to the list file  ' ;  
+		test -f "$PRODUCT_INSTANCE_DIR/$f" || doLog 'INFO if you do not need the file remove it from the list file  ' ;  
+		test -f "$PRODUCT_INSTANCE_DIR/$f" || ret=1
+		test -f "$PRODUCT_INSTANCE_DIR/$f" && break ;
 	done < <(cat $include_file)
 
 	doLog "DEBUG ret is $ret "
@@ -49,7 +43,7 @@ doCreateRelativePackage(){
 	# start: add the perl_ignore_file_pattern
 	while read -r line ; do \
 		got=$(echo $line|perl -ne 'm|^\s*#\s*perl_ignore_file_pattern\s*=(.*)$|g;print $1'); \
-		test -z "$got" || perl_ignore_file_pattern="$got|$perl_ignore_file_pattern" ;
+		test -z "$got" || perl_ignore_file_pattern="$got|${perl_ignore_file_pattern:-}" ;
 	done < <(cat $include_file)
 
 	# or how-to remove the last char from a string 	
@@ -66,7 +60,7 @@ doCreateRelativePackage(){
    
 	ret=$? ; 
    if (( $ret != 0 )); then
-      fatal_msg1="deleted $zip_file !!!"
+      fatal_msg1="deleting $zip_file !!!"
       fatal_msg2="because of packaging errors !!!"
       rm -fv $zip_file
       doLog "FATAL $fatal_msg1"
@@ -77,18 +71,17 @@ doCreateRelativePackage(){
       doLog "INFO created the following relative package:"
       doLog "INFO `stat -c \"%y %n\" $zip_file_name`"
 
-      test -z "$network_backup_dir" || \
-      mkdir -p $network_backup_dir && \
-      cmd="cp -v $zip_file $product_dir/dat/zip/" && doRunCmdAndLog "$cmd" && \
-      doLog "INFO with the following local backup  :" && \
-      doLog "INFO `stat -c \"%y %n\" $product_dir/dat/zip/$zip_file_name`" && \
-      doLog "INFO in the network dir @::" && \
-      doLog "INFO :: $network_backup_dir" && \
-      cmd="cp -v $zip_file $network_backup_dir/$zip_file_name" && doRunCmdAndLog "$cmd" && \
-      doLog "INFO with the following network backup  :" && \
-      doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_file_name\"`"
+      if [[ ${network_backup_dir+x} && -n $network_backup_dir ]] ; then
+         if [ -d "$network_backup_dir" ] ; then
+            doRunCmdAndLog "cp -v $zip_file $network_backup_dir/"
+            doLog "INFO with the following network backup  :" && \
+            doLog "INFO `stat -c \"%y %n\" \"$network_backup_dir/$zip_file_name\"`"
+         else
+            msg="skip backup as network_backup_dir is not configured"
+            doLog "INFO $msg"
+         fi
+      fi
    fi
 
 
 }
-#eof doCreateRelativePackage

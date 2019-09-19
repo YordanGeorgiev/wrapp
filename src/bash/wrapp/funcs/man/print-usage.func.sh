@@ -25,16 +25,20 @@ doPrintUsage(){
    
    2. run an action:  
 
+      bash src/bash/wrapp/wrapp.sh -a xls-to-db -t daily_issues,monthly_issues
+      bash src/bash/wrapp/wrapp.sh -a db-to-xls -t daily_issues,monthly_issues
+      bash src/bash/wrapp/wrapp.sh -a db-to-txt -t daily_issues,monthly_issues
+      bash src/bash/wrapp/wrapp.sh -a txt-to-db -t daily_issues,monthly_issues
+
       bash $0 -a run-wrapp
       bash $0 -a check-perl-modules-prerequisites
       bash $0 -a check-perl-syntax
-      bash $0 -a run-perl-tests
+      bash $0 -a run-functional-tests
       bash $0 -a run-wrapp
       bash $0 -a clone-to-app
       bash $0 -a gmail-package
       bash $0 -a morph-dir
       bash $0 -a change-env-type
-      bash $0 -a change-version
       bash $0 -a restore-tmux-session
       bash $0 -a generate-action-files
       bash $0 -a remove-action-files
@@ -74,5 +78,7 @@ Note the usage is quite long - you might wanto to use the less page :
    #------------------------------------------------------------------------------
 
 END_HELP
+
+
 }
 #eof func doPrintUsage

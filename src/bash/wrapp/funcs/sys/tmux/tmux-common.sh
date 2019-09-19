@@ -1,17 +1,13 @@
-#!/bin/bash 
-# source & courtesy of:
-# https://github.com/mislav/dotfiles/blob/master/bin/tmux-session
-# TODO: persist and restore_tmux_session the state & position of panes.
-
-dump_tmux_session(){
-  local d=$'\t'
-  tmux list-windows -a -F "#S${d}#W${d}#{pane_current_path}"
-}
-
-
-doSaveTmuxSession(){
-	doCheckTmuxIsInstalled
- 	dump_tmux_session > ~/.tmux-session
+doCheckTmuxIsInstalled(){
+   which tmux >/dev/null 2>&1 ||
+      { doLog "FATAL ERROR - tmux is not installed
+         or not in PATH. To install it do run
+         sudo apt-get install -y tmux
+         or
+         sudo yum install -y tmux
+         or
+         brew install tmux
+         Aborting." >&2; exit 1; }
 }
 
 
@@ -23,7 +19,6 @@ session_exists(){
   tmux has-session -t "$1" 2>/dev/null
 }
 
-
 add_window(){
   tmux new-window -d -t "$1:" -n "$2" -c "$3"
 }
@@ -32,17 +27,4 @@ add_window(){
 new_tmux_session(){
   cd "$3" &&
   tmux new-session -d -s "$1" -n "$2" $4
-}
-
-
-doCheckTmuxIsInstalled(){
-	which tmux >/dev/null 2>&1 ||
-		{ doLog "FATAL ERROR - tmux is not installed 
-         or not in PATH. To install it do run 
-         sudo apt-get install -y exuberant-ctags
-         or
-         sudo yum install -y exuberant-ctags
-         or 
-         brew install ctags
-         Aborting." >&2; exit 1; }
 }
